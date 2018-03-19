@@ -1,3 +1,4 @@
+@auth
 <li class="nav-item {{ Route::currentRouteNamed('stocks.*') ? 'active' : '' }}">
 	<a class="nav-link" href="{{ route('stocks.index') }}">
 		@lang('Stocks')
@@ -33,4 +34,4 @@
 		@lang('Currencies')
 	</a>
 </li>
-
+@endauth

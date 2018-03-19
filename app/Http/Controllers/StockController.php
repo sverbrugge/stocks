@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +19,7 @@ class StockController extends Controller
      */
     public function index()
     {
-        //
+        return view('stocks.index')->with('stocks', Stock::paginate());
     }
 
     /**
@@ -24,7 +29,7 @@ class StockController extends Controller
      */
     public function create()
     {
-        //
+        return view('stocks.create');
     }
 
     /**
@@ -35,7 +40,7 @@ class StockController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return redirect()->route('stocks.index');
     }
 
     /**
@@ -46,7 +51,7 @@ class StockController extends Controller
      */
     public function show(Stock $stock)
     {
-        //
+        return view('stocks.show')->with( 'stock', $stock );
     }
 
     /**
@@ -57,7 +62,7 @@ class StockController extends Controller
      */
     public function edit(Stock $stock)
     {
-        //
+        return view('stocks.edit')->with( 'stock', $stock );
     }
 
     /**
