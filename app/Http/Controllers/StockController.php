@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Stock;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
+
+use App\Stock;
+use App\Currency;
+use App\Exchange;
 
 class StockController extends Controller
 {
@@ -29,7 +34,10 @@ class StockController extends Controller
      */
     public function create()
     {
-        return view('stocks.create');
+        return view('stocks.create')->with([
+            'currencies'    => Currency::all(),
+            'exchanges'     => Exchange::all(),
+        ]);
     }
 
     /**
@@ -40,18 +48,33 @@ class StockController extends Controller
      */
     public function store(Request $request)
     {
-        return redirect()->route('stocks.index');
+        $request->validate([
+            'ticker'        => [ 'required', Rule::unique('stocks') ],
+            'name'          => [ 'required', Rule::unique('stocks') ],
+            'currency_id'   => [ 'required', 'exists:currencies,id' ],
+            'exchange_id'   => [ 'required', 'exists:exchanges,id' ],
+        ]);
+
+        $stock = Stock::create( $request->only('ticker', 'name', 'currency_id', 'exchange_id'));
+
+        return redirect()->route('stocks.index')->with([
+            'success' => __('The stock ":name (:ticker)" has been added.', [ 'name' => $stock->name, 'ticker' => $stock->ticker]),
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Stock  $stock
      * @return \Illuminate\Http\Response
      */
-    public function show(Stock $stock)
+    public function show(Request $request, Stock $stock)
     {
-        return view('stocks.show')->with( 'stock', $stock );
+        return view('stocks.show')->with([
+            'stock'             => $stock,
+            'confirmDeletion'   => $request->input('delete') == 'confirm',
+        ]);
     }
 
     /**
@@ -62,7 +85,11 @@ class StockController extends Controller
      */
     public function edit(Stock $stock)
     {
-        return view('stocks.edit')->with( 'stock', $stock );
+        return view('stocks.edit')->with([
+            'stock'         => $stock,
+            'currencies'    => Currency::all(),
+            'exchanges'     => Exchange::all(),
+        ]);
     }
 
     /**
@@ -74,7 +101,18 @@ class StockController extends Controller
      */
     public function update(Request $request, Stock $stock)
     {
-        //
+        $request->validate([
+            'ticker'        => [ 'required', Rule::unique('stocks')->ignore($stock->id) ],
+            'name'          => [ 'required', Rule::unique('stocks')->ignore($stock->id) ],
+            'currency_id'   => [ 'required', 'exists:currencies,id' ],
+            'exchange_id'   => [ 'required', 'exists:exchanges,id' ],
+        ]);
+
+        $stock->update($request->only('ticker', 'name', 'currency_id', 'exchange_id'));
+
+        return redirect()->route('stocks.show', [ 'stocks' => $stock ])->with([
+            'success' => __('Your changes have been saved.'),
+        ]);
     }
 
     /**
@@ -85,6 +123,14 @@ class StockController extends Controller
      */
     public function destroy(Stock $stock)
     {
-        //
+        try {
+            $stock->delete();
+        }
+        catch (QueryException $e)
+        {
+            return redirect()->route('stocks.show', [ 'stocks' => $stock])->with('warning', __('This item could not be deleted.'));
+        }
+
+        return redirect()->route('stocks.index')->with('info', __('You have succesfully deleted ":name".', [ 'name' => $stock->name ]));
     }
 }

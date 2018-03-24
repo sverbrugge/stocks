@@ -9,6 +9,13 @@ use App\Currency;
 
 class Stock extends Model
 {
+    protected $fillable = [
+        'ticker',
+        'name',
+        'currency_id',
+        'exchange_id'
+    ];
+
     protected $with = [
         'exchange',
         'currency',
