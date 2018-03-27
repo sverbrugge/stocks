@@ -60,8 +60,10 @@
 
                                 @foreach($share->children as $child)
                                     <tr>
-                                        <td>
-                                            &nbsp;
+                                        <td class="text-right">
+                                            <a href="{{ route('shares.show', [ 'shares' => $child ])}}">
+                                                <span class="badge badge-info">@lang('Sell')</span>
+                                            </a>
                                         </td>
                                         <td class="text-right">
                                                 {{ $child->transacted_at->formatLocalized('%d %B %Y') }}
@@ -71,6 +73,9 @@
                                         </td>
                                         <td class="text-right">
                                                 {{ $child->price }}
+                                        </td>
+                                        <td class="text-right">
+                                                {{ $child->exchange_rate }}
                                         </td>
                                     </tr>
                                 @endforeach

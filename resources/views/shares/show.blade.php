@@ -4,7 +4,12 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>@lang('Share ":name (:date)"', [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y') ])</h1>
+            <h1>
+                @lang('Share ":name (:date)"', [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y') ])
+                @if($share->parent)
+                    <span class="badge badge-info">@lang('Sell')</span>
+                @endif
+            </h1>
 
             @include('form.messages')
 
@@ -76,7 +81,7 @@
                     </form>
             </div>
         @else
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <a role="button" class="btn btn-primary" href="{{ route('shares.edit', [ 'shares' => $share ])}}">
                     @lang('Edit')
                 </a>
@@ -84,7 +89,14 @@
                     @lang('Back to index')
                 </a>
             </div>
-            <div class="col-md-6 text-right">
+            <div class="col-md-4 text-center">
+                @unless($share->parent)
+                    <a role="button" class="btn btn-info" href="{{ route('shares.create', [ 'sell' => $share ])}}">
+                        @lang('Sell')
+                    </a>
+                @endunless
+            </div>
+            <div class="col-md-4 text-right">
                 <a role="button" class="btn btn-danger" href="{{ route('shares.show', [ 'shares' => $share, 'delete' => 'confirm' ])}}">
                     @lang('Delete')
                 </a>

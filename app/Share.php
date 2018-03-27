@@ -14,6 +14,7 @@ class Share extends Model
     ];
 
     protected $fillable = [
+        'parent_id',
         'stock_id',
         'transacted_at',
         'amount',
@@ -37,7 +38,7 @@ class Share extends Model
 
     public function parent()
     {
-        return $this->belongsTo(self::class, 'parent_id')->withDefault();
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function children()

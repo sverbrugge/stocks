@@ -31,12 +31,23 @@ class ShareController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param \Illuminate\Http\Request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        $request->validate([
+            'sell' => [ 'nullable', 'exists:shares,id' ],
+        ]);
+
+        if($parent_id = $request->input('sell')) {
+            return view('shares.sell')->with([
+                'parent' => Share::findOrFail($parent_id),
+            ]);
+        }
+
         return view('shares.create')->with([
-            'stocks' => Stock::all(),
+            'stocks'    => Stock::all(),
         ]);
     }
 
@@ -49,6 +60,7 @@ class ShareController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'parent_id'     => [ 'nullable', 'exists:shares,id' ],
             'stock_id'      => [ 'required', 'exists:stocks,id' ],
             'transacted_at' => [ 'required', 'date_format:Y-m-d' ],
             'amount'        => [ 'required', 'integer' ],
@@ -56,10 +68,12 @@ class ShareController extends Controller
             'exchange_rate' => [ 'required', 'numeric' ],
         ]);
 
-        $share = Share::create( $request->only('stock_id', 'transacted_at', 'amount', 'price', 'exchange_rate'));
+        $share = Share::create($request->only('parent_id', 'stock_id', 'transacted_at', 'amount', 'price', 'exchange_rate'));
+
+        $message = $request->input('parent_id') ? 'The sell ":name (:date)" has been added.' : 'The share ":name (:date)" has been added.';
 
         return redirect()->route('shares.index')->with([
-            'success' => __('The share ":name (:date)" has been added.', [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y')]),
+            'success' => __($message, [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y')]),
         ]);
     }
 

@@ -4,21 +4,25 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>
-                @lang('Edit share ":name (:date)"', [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y') ])
-                @if($share->parent)
-                    <span class="badge badge-info">@lang('Sell')</span>
-                @endif
-            </h1>
+            <h1>@lang('Sell share :name (:date)', [ 'name' => $parent->stock->name, 'date' => $parent->transacted_at->formatLocalized('%d %B %Y') ])</h1>
 
-            <form action="{{ route('shares.update', [ 'shares' => $share ]) }}" method="post">
+            <form action="{{ route('shares.store') }}" method="post">
                 @csrf
-                @method('PUT')
+
+                @component('form.hidden')
+                    @slot('field', 'parent_id')
+                    @slot('value', $parent->id)
+                @endcomponent
+
+                @component('form.hidden')
+                    @slot('field', 'stock_id')
+                    @slot('value', $parent->stock->id)
+                @endcomponent
 
                 @component('form.input')
                     @slot('label', 'Stock')
                     @slot('field', 'stock')
-                    @slot('value', $share->stock->name)
+                    @slot('value', $parent->stock->name)
 
                     disabled
                 @endcomponent
@@ -26,7 +30,8 @@
                 @component('form.input')
                     @slot('label', 'Transaction date')
                     @slot('field', 'transacted_at')
-                    @slot('value', $share->transacted_at->formatLocalized('%Y-%m-%d'))
+                    @slot('placeholder', 'YYYY-MM-DD')
+                    @slot('value', date('Y-m-d'))
 
                     autofocus
                 @endcomponent
@@ -35,14 +40,12 @@
                     @slot('type', 'number')
                     @slot('label', 'Amount')
                     @slot('field', 'amount')
-                    @slot('value', $share->amount)
                 @endcomponent
 
                 @component('form.input')
                     @slot('type', 'number')
                     @slot('label', 'Price')
                     @slot('field', 'price')
-                    @slot('value', $share->price)
 
                     step="0.0001"
                 @endcomponent
@@ -51,13 +54,13 @@
                     @slot('type', 'number')
                     @slot('label', 'Exchange rate')
                     @slot('field', 'exchange_rate')
-                    @slot('value', $share->exchange_rate)
+                    @slot('value', 1)
 
                     step="0.0001"
                 @endcomponent
 
                 @component('form.submit')
-                    @slot('return_route', route('shares.show', [ 'shares' => $share ]))
+                    @slot('return_route', route('shares.index'))
                 @endcomponent
             </form>
 
