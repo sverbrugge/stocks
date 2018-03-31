@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Exchange;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
+
+use App\Exchange;
 
 class ExchangeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +22,7 @@ class ExchangeController extends Controller
      */
     public function index()
     {
-        //
+        return view('exchanges.index')->with('exchanges', Exchange::paginate());
     }
 
     /**
@@ -24,7 +32,7 @@ class ExchangeController extends Controller
      */
     public function create()
     {
-        //
+        return view('exchanges.create');
     }
 
     /**
@@ -35,18 +43,35 @@ class ExchangeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'          => [ 'required', Rule::unique('exchanges') ],
+            'timezone'      => [ 'required', 'timezone' ],
+            'trading_from'  => [ 'required', 'regex:/^\d\d:\d\d(:\d\d)?$/' ],
+            'trading_to'    => [ 'required', 'regex:/^\d\d:\d\d(:\d\d)?$/', 'different:trading_from' ],
+        ]);
+
+        $values = $request->only('name', 'timezone', 'trading_from', 'trading_to');
+
+        $exchange = Exchange::create($values);
+
+        return redirect()->route('exchanges.index')->with([
+            'success' => __('The exchange ":name" has been added.', [ 'name' => $exchange->name ]),
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Exchange  $exchange
      * @return \Illuminate\Http\Response
      */
-    public function show(Exchange $exchange)
+    public function show(Request $request, Exchange $exchange)
     {
-        //
+        return view('exchanges.show')->with([
+            'exchange'          => $exchange,
+            'confirmDeletion'   => $request->input('delete') == 'confirm',
+        ]);
     }
 
     /**
@@ -57,7 +82,9 @@ class ExchangeController extends Controller
      */
     public function edit(Exchange $exchange)
     {
-        //
+        return view('exchanges.edit')->with([
+            'exchange'      => $exchange,
+        ]);
     }
 
     /**
@@ -69,7 +96,20 @@ class ExchangeController extends Controller
      */
     public function update(Request $request, Exchange $exchange)
     {
-        //
+        $request->validate([
+            'name'          => [ 'required', Rule::unique('exchanges')->ignore($exchange->id) ],
+            'timezone'      => [ 'required', 'timezone' ],
+            'trading_from'  => [ 'required', 'regex:/^\d\d:\d\d(:\d\d)?$/' ],
+            'trading_to'    => [ 'required', 'regex:/^\d\d:\d\d(:\d\d)?$/', 'different:trading_from' ],
+        ]);
+
+        $values = $request->only('name', 'timezone', 'trading_from', 'trading_to');
+
+        $exchange->update($values);
+
+        return redirect()->route('exchanges.show', [ 'exchanges' => $exchange ])->with([
+            'success' => __('Your changes have been saved.'),
+        ]);
     }
 
     /**
@@ -80,6 +120,14 @@ class ExchangeController extends Controller
      */
     public function destroy(Exchange $exchange)
     {
-        //
+        try {
+            $exchange->delete();
+        }
+        catch (QueryException $e)
+        {
+            return redirect()->route('exchanges.show', [ 'exchanges' => $exchange])->with('warning', __('This item could not be deleted.'));
+        }
+
+        return redirect()->route('exchanges.index')->with('info', __('You have succesfully deleted ":name".', [ 'name' => $exchange->name ]));
     }
 }
