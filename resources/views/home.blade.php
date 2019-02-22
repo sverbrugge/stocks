@@ -2,21 +2,81 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Dashboard</div>
-
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    You are logged in!
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            @lang('Share')
+                        </th>
+                        <th>
+                            @lang('Currency')
+                        </th>
+                        <th>
+                            @lang('Date')
+                        </th>
+                        <th>
+                            @lang('Duration')
+                        </th>
+                        <th>
+                            @lang('Amount')
+                        </th>
+                        <th>
+                            @lang('Price')
+                        </th>
+                        <th>
+                            @lang('Total')
+                        </th>
+                        <th>
+                            @lang('Current')
+                        </th>
+                        <th>
+                            @lang('Gain')
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($shares as $share)
+                        <tr class="table-{{ $share->colorClass }}">
+                            <td>
+                                <a href="#">{{ $share->stock->name }}</a>
+                            </td>
+                            <td>
+                                {{ $share->stock->currency->code }}
+                            </td>
+                            <td>
+                                {{ $share->transacted_at->toDateString() }}
+                            </td>
+                            <td>
+                                {{ $share->transacted_at->diffForHumans() }}
+                            </td>
+                            <td class="text-right">
+                                {{ $share->amount }}
+                            </td>
+                            <td class="text-right">
+                                {{ $share->price }}
+                            </td>
+                            <td class="text-right">
+                                {{ $share->totalPrice }}
+                            </td>
+                            <?php $currentQuote = $share->stock->currentQuote; ?>
+                            <td class="text-right" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
+                                {{ $currentQuote->price }}
+                            </td>
+                            <td class="text-right">
+                                {{ sprintf('%.2f%%', ($currentQuote->price / $share->price * 100) - 100) }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9">
+                                @lang('No shares found')
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -4,9 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Exchange;
-use App\Currency;
-
 class Stock extends Model
 {
     protected $fillable = [
@@ -29,5 +26,13 @@ class Stock extends Model
     public function currency()
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    public function quote() {
+        return $this->hasMany(Quote::class);
+    }
+
+    public function getCurrentQuoteAttribute() {
+        return $this->quote()->orderBy('quoted_at', 'DESC')->first();
     }
 }
