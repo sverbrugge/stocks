@@ -53,6 +53,14 @@ class Share extends Model
         return number_format($this->amount * $this->price, 4);
     }
 
+    public function getGainAttribute() {
+        return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . ($this->stock->currentQuote->price - $this->price);
+    }
+
+    public function getPercentGainAttribute() {
+        return sprintf('%.2f%%', ($this->stock->currentQuote->price / $this->price * 100) - 100);
+    }
+
     public function getColorClassAttribute()
     {
         switch ($this->price <=> $this->stock->currentQuote->price)

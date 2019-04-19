@@ -28,11 +28,19 @@ class Stock extends Model
         return $this->belongsTo(Currency::class);
     }
 
-    public function quote() {
+    public function shares() {
+        return $this->hasMany(Share::class);
+    }
+
+    public function getActiveSharesAttribute() {
+        return $this->shares()->whereNull('parent_id')->get();
+    }
+
+    public function quotes() {
         return $this->hasMany(Quote::class);
     }
 
     public function getCurrentQuoteAttribute() {
-        return $this->quote()->orderBy('quoted_at', 'DESC')->first();
+        return $this->quotes()->orderBy('quoted_at', 'DESC')->first();
     }
 }

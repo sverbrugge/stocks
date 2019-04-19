@@ -38,9 +38,9 @@
                 </thead>
                 <tbody>
                     @forelse($shares as $share)
-                        <tr class="table-{{ $share->colorClass }}">
+                        <tr>
                             <td>
-                                <a href="#">{{ $share->stock->name }}</a>
+                                <a href="{{ route('graph', [ 'stock' => $share->stock->id ]) }}">{{ $share->stock->name }}</a>
                             </td>
                             <td>
                                 {{ $share->stock->currency->code }}
@@ -61,11 +61,11 @@
                                 {{ $share->totalPrice }}
                             </td>
                             <?php $currentQuote = $share->stock->currentQuote; ?>
-                            <td class="text-right" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
+                            <td class="text-right table-{{ $share->colorClass }}" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
                                 {{ $currentQuote->price }}
                             </td>
-                            <td class="text-right">
-                                {{ sprintf('%.2f%%', ($currentQuote->price / $share->price * 100) - 100) }}
+                            <td class="text-right table-{{ $share->colorClass }}">
+                                {{ $share->percentGain }}
                             </td>
                         </tr>
                     @empty
