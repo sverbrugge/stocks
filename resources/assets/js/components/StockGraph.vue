@@ -4,7 +4,6 @@
 
 <script>
     import highstock from 'highcharts/highstock';
-    require('highcharts/modules/debugger')(highstock);
     import axios from 'axios';
     export default {
         props: [
@@ -102,7 +101,6 @@
                         // do nothing
                     }
                 }
-                console.log(options.yAxis.plotLines);
                 highstock.stockChart(options);
             });
         }

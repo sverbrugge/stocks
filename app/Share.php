@@ -54,7 +54,7 @@ class Share extends Model
     }
 
     public function getGainAttribute() {
-        return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . ($this->stock->currentQuote->price - $this->price);
+        return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . sprintf('%.2f', $this->stock->currentQuote->price - $this->price);
     }
 
     public function getPercentGainAttribute() {

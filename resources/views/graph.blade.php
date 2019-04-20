@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <h1>{{ $stock->name }} <small class="text-muted">{{ $stock->ticker }}</small></h1>
 
-            @foreach ($stock->activeShares->unique('price') as $share)
+            @foreach ($stock->activeShares->unique('price')->sortBy('price') as $share)
                 <h2>
                     {{ $share->price }}
                     <small class="text-{{ $share->colorClass }}" title="{{ $stock->currentQuote->quoted_at }} ({{ $stock->currentQuote->quoted_at->diffForHumans() }})">
