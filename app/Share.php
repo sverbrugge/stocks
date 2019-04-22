@@ -57,6 +57,14 @@ class Share extends Model
         return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . sprintf('%.2f', $this->stock->currentQuote->price - $this->price);
     }
 
+    public function getSoldGainAttribute() {
+        return $this->parent ? sprintf('%.4f', $this->totalPrice - $this->parent->totalPrice) : '';
+    }
+
+    public function getSoldGainPercentAttribute() {
+        return $this->parent ? sprintf('%.2f', ($this->totalPrice - $this->parent->totalPrice) / $this->parent->totalPrice * 100) : '';
+    }
+
     public function getPercentGainAttribute() {
         return sprintf('%.2f%%', ($this->stock->currentQuote->price / $this->price * 100) - 100);
     }
@@ -73,5 +81,23 @@ class Share extends Model
         }
 
         return '';
+    }
+
+    public function getGainColorClassAttribute()
+    {
+        switch ($this->soldGain <=> 0)
+        {
+            case 1:
+                return 'success';
+
+            case -1:
+                return 'danger';
+        }
+
+        return '';
+    }
+
+    public function scopeSold(Builder $query) {
+        return $query->whereNotNull('parent_id');
     }
 }

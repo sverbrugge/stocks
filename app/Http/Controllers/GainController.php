@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Gain;
+use App\Share;
 
 class GainController extends Controller
 {
@@ -25,6 +25,6 @@ class GainController extends Controller
      */
     public function index()
     {
-        //
+        return view('gains')->with('shares', Share::sold()->paginate());
     }
 }
