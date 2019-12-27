@@ -5,6 +5,44 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * App\Share
+ *
+ * @property int $id
+ * @property int $stock_id
+ * @property int|null $parent_id
+ * @property \Illuminate\Support\Carbon|null $transacted_at
+ * @property int $amount
+ * @property float $price
+ * @property float $exchange_rate
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Share[] $children
+ * @property-read int|null $children_count
+ * @property-read mixed $color_class
+ * @property-read mixed $gain
+ * @property-read mixed $gain_color_class
+ * @property-read mixed $percent_gain
+ * @property-read mixed $sold_gain
+ * @property-read mixed $sold_gain_percent
+ * @property-read mixed $total_price
+ * @property-read \App\Share|null $parent
+ * @property-read \App\Stock $stock
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share sold()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereExchangeRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereStockId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereTransactedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Share extends Model
 {
     protected $dates = [
