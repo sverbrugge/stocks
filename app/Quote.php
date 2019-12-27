@@ -32,6 +32,12 @@ class Quote extends Model
         'quoted_at',
     ];
 
+    protected $fillable = [
+        'stock_id',
+        'price',
+        'quoted_at',
+    ];
+
     protected static function boot()
     {
         parent::boot();

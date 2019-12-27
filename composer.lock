@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0ee3adc3006e68312a83230227155378",
+    "content-hash": "e3c944472caabb9f34fd59853119571c",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -765,6 +765,46 @@
             ],
             "description": "Highlight PHP code in terminal",
             "time": "2018-09-29T18:48:56+00:00"
+        },
+        {
+            "name": "kokspflanze/alpha-vantage-api",
+            "version": "0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kokspflanze/alpha-vantage-api.git",
+                "reference": "31cce3dc880cc723e915218890f1cbf97d46db79"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kokspflanze/alpha-vantage-api/zipball/31cce3dc880cc723e915218890f1cbf97d46db79",
+                "reference": "31cce3dc880cc723e915218890f1cbf97d46db79",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5.18"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AlphaVantage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Alpha Vantage API client",
+            "homepage": "https://github.com/kokspflanze/alpha-vantage-api",
+            "keywords": [
+                "alpha-vantage",
+                "alphavantage",
+                "api"
+            ],
+            "time": "2019-12-22T12:24:45+00:00"
         },
         {
             "name": "laravel/framework",
