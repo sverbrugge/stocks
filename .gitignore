@@ -13,3 +13,4 @@ yarn-error.log
 .env
 /public/js
 /public/css
+/.idea/
