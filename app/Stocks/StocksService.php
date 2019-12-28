@@ -4,6 +4,7 @@ namespace App\Stocks;
 
 use AlphaVantage\Api\TimeSeries;
 use AlphaVantage\Client;
+use AlphaVantage\Exception\RuntimeException;
 use AlphaVantage\Options;
 use App\Quote;
 use App\Stock;
@@ -37,22 +38,25 @@ class StocksService
     /**
      * @param Collection $stocks
      * @param bool $full
-     * @return array
+     * @param bool $delay
+     * @return \Generator
+     * @throws \Throwable
      */
-    public function update(Collection $stocks, bool $full = false)
+    public function update(Collection $stocks, bool $full = false, bool $delay = true)
     {
         $outputType = $full ? TimeSeries::OUTPUT_TYPE_FULL : TimeSeries::OUTPUT_TYPE_COMPACT;
         $updated = [];
 
-        $stocks->each(function ($stock) use ($outputType, &$updated) {
-            $data = $this->getTimeSeriesDaily($stock, $outputType);
+        foreach ($stocks as $stock) {
+            $data = $this->getTimeSeriesDaily($stock, $outputType, $delay);
             $updated[$stock->ticker] = [
+                'ticker' => $stock->ticker,
                 'count' => $data->count(),
                 'date_min' => $data->keys()->sort()->first(),
                 'date_max' => $data->keys()->sort()->last(),
             ];
 
-            $data->each(function ($day, $date) use ($stock, &$updatedDate) {
+            foreach ($data as $date => $day) {
                 $date = new Carbon($date, new DateTimeZone($stock->exchange->timezone));
 
                 $dataPoints = [
@@ -81,18 +85,28 @@ class StocksService
                         'quoted_at' => $timestamp,
                     ]);
                 }
-            });
+            };
 
-            sleep(self::API_CALL_DELAY);
-        });
-
-        return $updated;
+            yield $updated[$stock->ticker];
+        };
     }
 
-    protected function getTimeSeriesDaily(Stock $stock, string $outputType)
+    protected function getTimeSeriesDaily(Stock $stock, string $outputType, bool $delay = true)
     {
-        return Cache::remember($stock->ticker. $outputType, self::TTL, function () use ($stock, $outputType) {
-            return collect($this->client->timeSeries()->daily($stock->ticker, $outputType)['Time Series (Daily)']);
+        return Cache::remember($stock->ticker. $outputType, self::TTL, function () use ($stock, $outputType, $delay) {
+            $result = collect();
+
+            try {
+                $result =  collect($this->client->timeSeries()->daily($stock->ticker, $outputType)['Time Series (Daily)']);
+            } catch (RuntimeException $e) {
+                logger('Error getting daily time series for "' . $stock->ticker . '"');
+            }
+
+            if ($delay) {
+                sleep(self::API_CALL_DELAY);
+            }
+
+            return $result;
         });
     }
 }
