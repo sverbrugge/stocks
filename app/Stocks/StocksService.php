@@ -42,7 +42,7 @@ class StocksService
      * @return \Generator
      * @throws \Throwable
      */
-    public function update(Collection $stocks, bool $full = false, bool $delay = true)
+    public function updateHistorical(Collection $stocks, bool $full = false, bool $delay = true)
     {
         $outputType = $full ? TimeSeries::OUTPUT_TYPE_FULL : TimeSeries::OUTPUT_TYPE_COMPACT;
         $updated = [];
@@ -68,6 +68,12 @@ class StocksService
                     if (empty($day[$key]) && !floatval($day[$key])) {
                         continue;
                     }
+
+                    if ($timestamp->isFuture()) {
+                        continue;
+                    }
+
+                    $timestamp->timezone = config('app.timezone');
 
                     $existingStock = Quote::where('stock_id', $stock->id)->where('quoted_at', $timestamp)->first();
                     if ($existingStock) {

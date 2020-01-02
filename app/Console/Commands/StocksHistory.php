@@ -7,21 +7,21 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 
-class StocksUpdate extends Command
+class StocksHistory extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'stocks:update {--all} {--full} {symbol?}';
+    protected $signature = 'stocks:history {--all} {--full} {symbol?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Update stocks data';
+    protected $description = 'Update historical stocks data';
 
     /**
      * Create a new command instance.
@@ -63,7 +63,7 @@ class StocksUpdate extends Command
         $progressBar->setFormat('very_verbose');
         $progressBar->start();
 
-        $updatedStocks = $stocksService->update($stocks, $full);
+        $updatedStocks = $stocksService->updateHistorical($stocks, $full);
         $processedStocks = [];
 
         foreach ($updatedStocks as $data) {
