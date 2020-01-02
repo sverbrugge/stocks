@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Cache;
 class StocksService
 {
     const API_CALL_DELAY = 15;
-    const TTL = 86400;
+    const TTL_TIMESERIES = 86400;
+    const TTL_QUOTE = 3600;
 
     protected $client;
 
@@ -33,6 +34,44 @@ class StocksService
     public function getTicker(string $ticker)
     {
         return Stock::where('ticker', $ticker)->firstOrFail();
+    }
+
+    /**
+     * @param Collection $stocks
+     * @param bool $delay
+     * @return \Generator
+     * @throws \Exception
+     */
+    public function update(Collection $stocks, bool $delay = true)
+    {
+        foreach ($stocks as $stock) {
+            $timestamp = new Carbon('now', new DateTimeZone($stock->exchange->timezone));
+
+            $tradingFrom = $timestamp->setTimeFromTimeString($stock->exchange->trading_from);
+            $tradingTo = $timestamp->clone()->setTimeFromTimeString($stock->exchange->trading_to);
+
+            $result = [
+                'ticker' => $stock->ticker,
+                'price' => null,
+            ];
+
+            if ($tradingFrom->isPast() && $tradingTo->isFuture()) {
+                $data = $this->getQuote($stock, $delay);
+
+                if (!empty($data)) {
+                    $latestTradingDay = new Carbon($data['07. latest trading day'], new DateTimeZone($stock->exchange->timezone));
+
+                    if ($latestTradingDay->isToday()) {
+                        $result['price'] = (float)$data['05. price'];
+                        $this->addQuote($stock, new Carbon(), $result['price']);
+                    }
+                }
+            } else {
+                logger('Stock exchange currently not trading: ' . $stock->ticker);
+            }
+
+            yield $result;
+        }
     }
 
     /**
@@ -73,23 +112,7 @@ class StocksService
                         continue;
                     }
 
-                    $timestamp->timezone = config('app.timezone');
-
-                    $existingStock = Quote::where('stock_id', $stock->id)->where('quoted_at', $timestamp)->first();
-                    if ($existingStock) {
-                        $existingStock->update([
-                            'price' => $day[$key],
-                            'quoted_at' => $timestamp,
-                        ]);
-                        $existingStock->saveOrFail();
-                        continue;
-                    }
-
-                    Quote::create([
-                        'stock_id' => $stock->id,
-                        'price' => $day[$key],
-                        'quoted_at' => $timestamp,
-                    ]);
+                    $this->addQuote($stock, $timestamp, (float)$day[$key]);
                 }
             };
 
@@ -97,15 +120,61 @@ class StocksService
         };
     }
 
+    /**
+     * @param Stock $stock
+     * @param Carbon $timestamp
+     * @param float $price
+     * @throws \Throwable
+     */
+    protected function addQuote(Stock $stock, Carbon $timestamp, float $price)
+    {
+        $timestamp->timezone = config('app.timezone');
+
+        $existingStock = Quote::where('stock_id', $stock->id)->where('quoted_at', $timestamp)->first();
+        if ($existingStock) {
+            $existingStock->update([
+                'price' => $price,
+                'quoted_at' => $timestamp,
+            ]);
+            $existingStock->saveOrFail();
+            return;
+        }
+
+        Quote::create([
+            'stock_id' => $stock->id,
+            'price' => $price,
+            'quoted_at' => $timestamp,
+        ]);
+    }
+
     protected function getTimeSeriesDaily(Stock $stock, string $outputType, bool $delay = true)
     {
-        return Cache::remember($stock->ticker. $outputType, self::TTL, function () use ($stock, $outputType, $delay) {
+        return Cache::remember($stock->ticker . $outputType, self::TTL_TIMESERIES, function () use ($stock, $outputType, $delay) {
             $result = collect();
 
             try {
-                $result =  collect($this->client->timeSeries()->daily($stock->ticker, $outputType)['Time Series (Daily)']);
+                $result = collect($this->client->timeSeries()->daily($stock->ticker, $outputType)['Time Series (Daily)']);
             } catch (RuntimeException $e) {
                 logger('Error getting daily time series for "' . $stock->ticker . '"');
+            }
+
+            if ($delay) {
+                sleep(self::API_CALL_DELAY);
+            }
+
+            return $result;
+        });
+    }
+
+    protected function getQuote(Stock $stock, bool $delay = true)
+    {
+        return Cache::remember($stock->ticker . 'quote', self::TTL_QUOTE, function () use ($stock, $delay) {
+            $result = [];
+
+            try {
+                $result = $this->client->timeSeries()->globalQuote($stock->ticker)['Global Quote'];
+            } catch (RuntimeException $e) {
+                logger('Error getting quote for "' . $stock->ticker . '"');
             }
 
             if ($delay) {
