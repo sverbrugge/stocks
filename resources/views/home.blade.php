@@ -61,9 +61,15 @@
                                 {{ $share->totalPrice }}
                             </td>
                             <?php $currentQuote = $share->stock->currentQuote; ?>
-                            <td class="text-right table-{{ $share->colorClass }}" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
-                                {{ $currentQuote->price }}
-                            </td>
+                            @if($currentQuote)
+                                <td class="text-right table-{{ $share->colorClass }}" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
+                                    {{ $currentQuote->price }}
+                                </td>
+                            @else
+                                <td class="text-right table-{{ $share->colorClass }}">
+
+                                </td>
+                            @endif
                             <td class="text-right table-{{ $share->colorClass }}">
                                 {{ $share->percentGain }}
                             </td>

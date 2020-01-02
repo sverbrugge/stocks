@@ -104,11 +104,21 @@ class Share extends Model
     }
 
     public function getPercentGainAttribute() {
-        return sprintf('%.2f%%', ($this->stock->currentQuote->price / $this->price * 100) - 100);
+        $currentQuote = $this->stock->currentQuote;
+
+        if (!$currentQuote) {
+            return '';
+        }
+
+        return sprintf('%.2f%%', ( $currentQuote->price / $this->price * 100) - 100);
     }
 
     public function getColorClassAttribute()
     {
+        if (!$this->stock->currentQuote) {
+            return '';
+        }
+
         switch ($this->price <=> $this->stock->currentQuote->price)
         {
             case -1:
