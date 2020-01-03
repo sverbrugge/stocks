@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -33,6 +34,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereTicker($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int $active
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock active($active = true)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereActive($value)
  */
 class Stock extends Model
 {
@@ -40,7 +44,8 @@ class Stock extends Model
         'ticker',
         'name',
         'currency_id',
-        'exchange_id'
+        'exchange_id',
+        'active'
     ];
 
     protected $with = [
@@ -72,5 +77,10 @@ class Stock extends Model
 
     public function getCurrentQuoteAttribute() {
         return $this->quotes()->orderBy('quoted_at', 'DESC')->first();
+    }
+
+    public function scopeActive(Builder $query, bool $active = true)
+    {
+        return $query->where('active', $active);
     }
 }

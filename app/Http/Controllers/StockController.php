@@ -20,17 +20,22 @@ class StockController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('stocks.index')->with('stocks', Stock::paginate());
+        $inactive = $request->get('inactive');
+        return view('stocks.index')->with([
+            'stocks' => Stock::active(!$inactive)->paginate(),
+            'inactive' => $inactive,
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create()
     {
@@ -44,7 +49,7 @@ class StockController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -67,7 +72,7 @@ class StockController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Stock  $stock
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(Request $request, Stock $stock)
     {
@@ -81,7 +86,7 @@ class StockController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Stock  $stock
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(Stock $stock)
     {
@@ -97,7 +102,7 @@ class StockController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Stock  $stock
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(Request $request, Stock $stock)
     {
@@ -106,9 +111,10 @@ class StockController extends Controller
             'name'          => [ 'required', Rule::unique('stocks')->ignore($stock->id) ],
             'currency_id'   => [ 'required', 'exists:currencies,id' ],
             'exchange_id'   => [ 'required', 'exists:exchanges,id' ],
+            'active'        => [ 'required', 'boolean' ],
         ]);
 
-        $stock->update($request->only('ticker', 'name', 'currency_id', 'exchange_id'));
+        $stock->update($request->only('ticker', 'name', 'currency_id', 'exchange_id', 'active'));
 
         return redirect()->route('stocks.show', [ 'stocks' => $stock ])->with([
             'success' => __('Your changes have been saved.'),
@@ -118,8 +124,9 @@ class StockController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Stock  $stock
-     * @return \Illuminate\Http\Response
+     * @param \App\Stock $stock
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Stock $stock)
     {

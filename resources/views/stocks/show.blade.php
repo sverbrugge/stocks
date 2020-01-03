@@ -40,6 +40,14 @@
 
                     readonly
                 @endcomponent
+
+                @component('form.input')
+                    @slot('label', 'Active')
+                    @slot('field', 'active')
+                    @slot('value', __($stock->active ? 'Yes' : 'No'))
+
+                    readonly
+                @endcomponent
             </form>
 
         </div>
@@ -69,7 +77,7 @@
                 <a role="button" class="btn btn-primary" href="{{ route('stocks.edit', [ 'stocks' => $stock ])}}">
                     @lang('Edit')
                 </a>
-                <a role="button" class="btn btn-secondary" href="{{ route('stocks.index') }}">
+                <a role="button" class="btn btn-secondary" href="{{ route('stocks.index', ['inactive' => !$stock->active ?: null]) }}">
                     @lang('Back to index')
                 </a>
             </div>

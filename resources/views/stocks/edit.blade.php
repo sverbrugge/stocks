@@ -39,6 +39,12 @@
                     @slot('options', $exchanges)
                 @endcomponent
 
+                @component('form.select.yesno')
+                    @slot('label', 'Active')
+                    @slot('field', 'active')
+                    @slot('value', $stock->active)
+                @endcomponent
+
                 @component('form.submit')
                     @slot('return_route', route('stocks.show', [ 'stocks' => $stock ]))
                 @endcomponent
