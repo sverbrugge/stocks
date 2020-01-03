@@ -41,6 +41,9 @@
                         <tr>
                             <td>
                                 <a href="{{ route('graph', [ 'stock' => $share->stock->id ]) }}">{{ $share->stock->name }}</a>
+                                @if($share->allSharesSold)
+                                    <span class="badge badge-info">@lang('All shares sold')</span>
+                                @endif
                             </td>
                             <td>
                                 {{ $share->stock->currency->code }}

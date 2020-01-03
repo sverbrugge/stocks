@@ -42,6 +42,10 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereTransactedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int $active
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share active($active = true)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereActive($value)
+ * @property-read bool $all_shares_sold
  */
 class Share extends Model
 {
@@ -56,6 +60,7 @@ class Share extends Model
         'amount',
         'price',
         'exchange_rate',
+        'active',
     ];
 
     protected $with = [
@@ -91,26 +96,30 @@ class Share extends Model
         return number_format($this->amount * $this->price, 4);
     }
 
-    public function getGainAttribute() {
+    public function getGainAttribute()
+    {
         return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . sprintf('%.2f', $this->stock->currentQuote->price - $this->price);
     }
 
-    public function getSoldGainAttribute() {
+    public function getSoldGainAttribute()
+    {
         return $this->parent ? sprintf('%.4f', $this->totalPrice - $this->parent->totalPrice) : '';
     }
 
-    public function getSoldGainPercentAttribute() {
+    public function getSoldGainPercentAttribute()
+    {
         return $this->parent ? sprintf('%.2f', ($this->totalPrice - $this->parent->totalPrice) / $this->parent->totalPrice * 100) : '';
     }
 
-    public function getPercentGainAttribute() {
+    public function getPercentGainAttribute()
+    {
         $currentQuote = $this->stock->currentQuote;
 
         if (!$currentQuote) {
             return '';
         }
 
-        return sprintf('%.2f%%', ( $currentQuote->price / $this->price * 100) - 100);
+        return sprintf('%.2f%%', ($currentQuote->price / $this->price * 100) - 100);
     }
 
     public function getColorClassAttribute()
@@ -119,8 +128,7 @@ class Share extends Model
             return '';
         }
 
-        switch ($this->price <=> $this->stock->currentQuote->price)
-        {
+        switch ($this->price <=> $this->stock->currentQuote->price) {
             case -1:
                 return 'success';
 
@@ -133,8 +141,7 @@ class Share extends Model
 
     public function getGainColorClassAttribute()
     {
-        switch ($this->soldGain <=> 0)
-        {
+        switch ($this->soldGain <=> 0) {
             case 1:
                 return 'success';
 
@@ -145,7 +152,19 @@ class Share extends Model
         return '';
     }
 
-    public function scopeSold(Builder $query) {
+    public function getAllSharesSoldAttribute()
+    {
+        $parent = $this->parent ?: $this;
+        return $parent->children->sum('amount') === $parent->amount;
+    }
+
+    public function scopeSold(Builder $query)
+    {
         return $query->whereNotNull('parent_id');
+    }
+
+    public function scopeActive(Builder $query, bool $active = true)
+    {
+        return $query->where('active', $active);
     }
 }

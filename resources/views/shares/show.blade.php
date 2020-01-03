@@ -56,6 +56,16 @@
 
                     readonly
                 @endcomponent
+
+                @if(!$share->parent_id)
+                    @component('form.input')
+                        @slot('label', 'Active')
+                        @slot('field', 'active')
+                        @slot('value', __($share->active ? 'Yes' : 'No'))
+
+                        readonly
+                    @endcomponent
+                @endif
             </form>
 
         </div>
@@ -85,12 +95,12 @@
                 <a role="button" class="btn btn-primary" href="{{ route('shares.edit', [ 'shares' => $share ])}}">
                     @lang('Edit')
                 </a>
-                <a role="button" class="btn btn-secondary" href="{{ route('shares.index') }}">
+                <a role="button" class="btn btn-secondary" href="{{ route('shares.index', ['inactive' => (($share->parent && !$share->parent->active) || !$share->active) ?: null]) }}">
                     @lang('Back to index')
                 </a>
             </div>
             <div class="col-md-4 text-center">
-                @unless($share->parent)
+                @unless($share->parent || $share->allSharesSold)
                     <a role="button" class="btn btn-info" href="{{ route('shares.create', [ 'sell' => $share ])}}">
                         @lang('Sell')
                     </a>

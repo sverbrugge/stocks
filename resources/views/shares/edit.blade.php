@@ -56,6 +56,14 @@
                     step="0.0001"
                 @endcomponent
 
+                @if(!$share->parent_id)
+                    @component('form.select.yesno')
+                        @slot('label', 'Active')
+                        @slot('field', 'active')
+                        @slot('value', $share->active)
+                    @endcomponent
+                @endif
+
                 @component('form.submit')
                     @slot('return_route', route('shares.show', [ 'shares' => $share ]))
                 @endcomponent

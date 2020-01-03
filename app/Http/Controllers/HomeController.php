@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Share;
 
 class HomeController extends Controller
@@ -20,10 +19,10 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index()
     {
-        return view('home')->with('shares', Share::whereNull('parent_id')->get());
+        return view('home')->with('shares', Share::active()->with('children')->whereNull('parent_id')->get());
     }
 }

@@ -4,16 +4,17 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1>@lang('Shares')</h1>
+                    <h1>@lang($inactive ? 'Inactive shares': 'Shares')</h1>
 
                     @include('form.messages')
 
                     <div class="float-left">
                         <a class="btn btn-primary" href="{{ route('shares.create') }}">@lang('Add new share')</a>
+                        <a class="btn btn-secondary" href="{{ route('shares.index', ['inactive' => !$inactive]) }}">@lang($inactive ? 'Show only active shares' : 'Show only inactive shares')</a>
                     </div>
 
                     <div class="float-right">
-                        {{ $shares->links() }}
+                        {{ $shares->appends(['inactive' => $inactive])->links() }}
                     </div>
 
                     <table class="table table-striped">
@@ -80,13 +81,17 @@
                                     </tr>
                                 @endforeach
                             @empty
-                                @lang('No shares could be found')
+                                <tr>
+                                    <td colspan="5">
+                                        @lang($inactive ? 'No inactive shares found' : 'No active shares found')
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
 
                     <div class="float-right">
-                        {{ $shares->links() }}
+                        {{ $shares->appends(['inactive' => $inactive])->links() }}
                     </div>
                 </div>
             </div>

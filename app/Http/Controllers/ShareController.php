@@ -19,12 +19,15 @@ class ShareController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $inactive = $request->get('inactive');
         return view('shares.index')->with([
-            'shares' => Share::with(['stock', 'children'])->whereNull('parent_id')->paginate(),
+            'shares' => Share::active(!$inactive)->with(['stock', 'children'])->whereNull('parent_id')->paginate(),
+            'inactive' => $inactive,
         ]);
     }
 
@@ -32,7 +35,7 @@ class ShareController extends Controller
      * Show the form for creating a new resource.
      *
      * @param \Illuminate\Http\Request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create(Request $request)
     {
@@ -55,7 +58,7 @@ class ShareController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -82,7 +85,7 @@ class ShareController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Share  $share
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(Request $request, Share $share)
     {
@@ -96,7 +99,7 @@ class ShareController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Share  $share
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(Share $share)
     {
@@ -110,7 +113,7 @@ class ShareController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Share  $share
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(Request $request, Share $share)
     {
@@ -121,7 +124,15 @@ class ShareController extends Controller
             'exchange_rate' => [ 'required', 'numeric' ],
         ]);
 
-        $share->update($request->only('transacted_at', 'amount', 'price'));
+        $fields = ['transacted_at', 'amount', 'price', 'active'];
+        if (!$share->parent_id) {
+            $request->validate([
+                'active'        => [ 'required', 'boolean' ],
+            ]);
+            $fields[] = 'active';
+        }
+
+        $share->update($request->only($fields));
 
         return redirect()->route('shares.show', [ 'shares' => $share ])->with([
             'success' => __('Your changes have been saved.'),
@@ -131,8 +142,9 @@ class ShareController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Share  $share
-     * @return \Illuminate\Http\Response
+     * @param \App\Share $share
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Share $share)
     {
