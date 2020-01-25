@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $active
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock active($active = true)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock ticker($ticker)
  */
 class Stock extends Model
 {
@@ -82,5 +83,10 @@ class Stock extends Model
     public function scopeActive(Builder $query, bool $active = true)
     {
         return $query->where('active', $active);
+    }
+
+    public function scopeTicker(Builder $query, string $ticker)
+    {
+        return $query->where('ticker', $ticker);
     }
 }
