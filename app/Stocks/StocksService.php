@@ -4,19 +4,22 @@ namespace App\Stocks;
 
 use AlphaVantage\Api\TimeSeries;
 use AlphaVantage\Client;
-use AlphaVantage\Exception\RuntimeException;
 use AlphaVantage\Options;
+use App\Exceptions\StockNotTradingException;
 use App\Quote;
 use App\Stock;
 use DateTimeZone;
+use Exception;
+use Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class StocksService
 {
     const API_CALL_DELAY = 15;
-    const TTL_TIMESERIES = 86400;
+    const TTL_TIME_SERIES = 86400;
     const TTL_QUOTE = 3600;
 
     protected $client;
@@ -28,19 +31,20 @@ class StocksService
 
     public function getAllTickers()
     {
-        return Stock::all();
+        return Stock::active()->get();
     }
 
     public function getTicker(string $ticker)
     {
-        return Stock::where('ticker', $ticker)->firstOrFail();
+        return Stock::ticker($ticker)->active()->firstOrFail();
     }
 
     /**
      * @param Collection $stocks
      * @param bool $delay
-     * @return \Generator
-     * @throws \Exception
+     * @return Generator
+     * @throws Exception
+     * @throws Throwable
      */
     public function update(Collection $stocks, bool $delay = true)
     {
@@ -53,21 +57,26 @@ class StocksService
             $result = [
                 'ticker' => $stock->ticker,
                 'price' => null,
+                'exception' => null,
             ];
 
-            if ($tradingFrom->isPast() && $tradingTo->isFuture()) {
-                $data = $this->getQuote($stock, $delay);
+            try {
+                if ($tradingFrom->isPast() && $tradingTo->isFuture()) {
+                    $data = $this->getQuote($stock, $delay);
 
-                if (!empty($data)) {
-                    $latestTradingDay = new Carbon($data['07. latest trading day'], new DateTimeZone($stock->exchange->timezone));
+                    if (!empty($data)) {
+                        $latestTradingDay = new Carbon($data['07. latest trading day'], new DateTimeZone($stock->exchange->timezone));
 
-                    if ($latestTradingDay->isToday()) {
-                        $result['price'] = (float)$data['05. price'];
-                        $this->addQuote($stock, new Carbon(), $result['price']);
+                        if ($latestTradingDay->isToday()) {
+                            $result['price'] = (float)$data['05. price'];
+                            $this->addQuote($stock, new Carbon(), $result['price']);
+                        }
                     }
+                } else {
+                    throw new StockNotTradingException();
                 }
-            } else {
-                logger('Stock exchange currently not trading: ' . $stock->ticker);
+            } catch (Exception $e) {
+                $result['exception'] = $e;
             }
 
             yield $result;
@@ -78,8 +87,8 @@ class StocksService
      * @param Collection $stocks
      * @param bool $full
      * @param bool $delay
-     * @return \Generator
-     * @throws \Throwable
+     * @return Generator
+     * @throws Throwable
      */
     public function updateHistorical(Collection $stocks, bool $full = false, bool $delay = true)
     {
@@ -87,34 +96,44 @@ class StocksService
         $updated = [];
 
         foreach ($stocks as $stock) {
-            $data = $this->getTimeSeriesDaily($stock, $outputType, $delay);
             $updated[$stock->ticker] = [
                 'ticker' => $stock->ticker,
-                'count' => $data->count(),
-                'date_min' => $data->keys()->sort()->first(),
-                'date_max' => $data->keys()->sort()->last(),
+                'count' => null,
+                'date_min' => null,
+                'date_max' => null,
+                'exception' => null,
             ];
 
-            foreach ($data as $date => $day) {
-                $date = new Carbon($date, new DateTimeZone($stock->exchange->timezone));
+            try {
+                $data = $this->getTimeSeriesDaily($stock, $outputType, $delay);
 
-                $dataPoints = [
-                    '1. open' => $date->clone()->setTimeFromTimeString($stock->exchange->trading_from),
-                    '4. close' => $date->clone()->setTimeFromTimeString($stock->exchange->trading_to),
-                ];
+                $updated[$stock->ticker]['count'] = $data->count();
+                $updated[$stock->ticker]['date_min'] = $data->keys()->sort()->first();
+                $updated[$stock->ticker]['date_max'] = $data->keys()->sort()->last();
 
-                foreach ($dataPoints as $key => $timestamp) {
-                    if (empty($day[$key]) && !floatval($day[$key])) {
-                        continue;
+                foreach ($data as $date => $day) {
+                    $date = new Carbon($date, new DateTimeZone($stock->exchange->timezone));
+
+                    $dataPoints = [
+                        '1. open' => $date->clone()->setTimeFromTimeString($stock->exchange->trading_from),
+                        '4. close' => $date->clone()->setTimeFromTimeString($stock->exchange->trading_to),
+                    ];
+
+                    foreach ($dataPoints as $key => $timestamp) {
+                        if (empty($day[$key]) && !floatval($day[$key])) {
+                            continue;
+                        }
+
+                        if ($timestamp->isFuture()) {
+                            continue;
+                        }
+
+                        $this->addQuote($stock, $timestamp, (float)$day[$key]);
                     }
-
-                    if ($timestamp->isFuture()) {
-                        continue;
-                    }
-
-                    $this->addQuote($stock, $timestamp, (float)$day[$key]);
-                }
-            };
+                };
+            } catch (Exception $e) {
+                $updated[$stock->ticker]['exception'] = $e;
+            }
 
             yield $updated[$stock->ticker];
         };
@@ -124,7 +143,7 @@ class StocksService
      * @param Stock $stock
      * @param Carbon $timestamp
      * @param float $price
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function addQuote(Stock $stock, Carbon $timestamp, float $price)
     {
@@ -147,38 +166,47 @@ class StocksService
         ]);
     }
 
+    /**
+     * Get historical data from API
+     *
+     * @param Stock $stock
+     * @param string $outputType
+     * @param bool $delay
+     * @return Collection
+     * @throws Exception
+     */
     protected function getTimeSeriesDaily(Stock $stock, string $outputType, bool $delay = true)
     {
-        return Cache::remember($stock->ticker . $outputType, self::TTL_TIMESERIES, function () use ($stock, $outputType, $delay) {
-            $result = collect();
-
+        return Cache::remember($stock->ticker . $outputType, self::TTL_TIME_SERIES, function () use ($stock, $outputType, $delay) {
             try {
                 $result = collect($this->client->timeSeries()->daily($stock->ticker, $outputType)['Time Series (Daily)']);
-            } catch (RuntimeException $e) {
-                logger('Error getting daily time series for "' . $stock->ticker . '"');
-            }
-
-            if ($delay) {
-                sleep(self::API_CALL_DELAY);
+            } finally {
+                if ($delay) {
+                    sleep(self::API_CALL_DELAY);
+                }
             }
 
             return $result;
         });
     }
 
+    /**
+     * Get current quote from API
+     *
+     * @param Stock $stock
+     * @param bool $delay
+     * @return array
+     * @throws Exception
+     */
     protected function getQuote(Stock $stock, bool $delay = true)
     {
         return Cache::remember($stock->ticker . 'quote', self::TTL_QUOTE, function () use ($stock, $delay) {
-            $result = [];
-
             try {
                 $result = $this->client->timeSeries()->globalQuote($stock->ticker)['Global Quote'];
-            } catch (RuntimeException $e) {
-                logger('Error getting quote for "' . $stock->ticker . '"');
-            }
-
-            if ($delay) {
-                sleep(self::API_CALL_DELAY);
+            } finally {
+                if ($delay) {
+                    sleep(self::API_CALL_DELAY);
+                }
             }
 
             return $result;

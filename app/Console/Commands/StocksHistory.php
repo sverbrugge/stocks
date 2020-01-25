@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Stocks\StocksService;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
@@ -56,7 +57,7 @@ class StocksHistory extends Command
         try {
             $stocks = $this->option('all') ? $stocksService->getAllTickers() : new Collection([$stocksService->getTicker($this->argument('symbol'))]);
         } catch (ModelNotFoundException $e) {
-            $this->warn('Ticker symbol not found: "' . $this->argument('symbol') . '"');
+            $this->warn('Ticker symbol not found or not active: "' . $this->argument('symbol') . '"');
             return null;
         }
         $progressBar = $this->output->createProgressBar($stocks->count());
@@ -67,6 +68,10 @@ class StocksHistory extends Command
         $processedStocks = [];
 
         foreach ($updatedStocks as $data) {
+            if ($data['exception'] instanceof Exception) {
+                $data['exception'] = $data['exception']->getMessage();
+            }
+
             $processedStocks[] = $data;
             $progressBar->advance();
         }
@@ -78,6 +83,7 @@ class StocksHistory extends Command
             'count' => 'Data points',
             'date_min' => 'From',
             'date_max' => 'To',
+            'exception' => 'Exception',
         ];
         $this->table($headers, $processedStocks);
 

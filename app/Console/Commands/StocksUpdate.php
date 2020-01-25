@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Stocks\StocksService;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
@@ -37,7 +38,8 @@ class StocksUpdate extends Command
      * Execute the console command.
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
+     * @throws \Throwable
      */
     public function handle()
     {
@@ -51,7 +53,7 @@ class StocksUpdate extends Command
         try {
             $stocks = $this->option('all') ? $stocksService->getAllTickers() : new Collection([$stocksService->getTicker($this->argument('symbol'))]);
         } catch (ModelNotFoundException $e) {
-            $this->warn('Ticker symbol not found: "' . $this->argument('symbol') . '"');
+            $this->warn('Ticker symbol not found or not active: "' . $this->argument('symbol') . '"');
             return null;
         }
 
@@ -63,6 +65,10 @@ class StocksUpdate extends Command
         $processedStocks = [];
 
         foreach ($updatedStocks as $data) {
+            if ($data['exception'] instanceof Exception) {
+                $data['exception'] = $data['exception']->getMessage();
+            }
+
             $processedStocks[] = $data;
             $progressBar->advance();
         }
@@ -72,6 +78,7 @@ class StocksUpdate extends Command
         $headers = [
             'ticker' => 'Symbol',
             'price' => 'Price',
+            'exception' => 'Exception',
         ];
         $this->table($headers, $processedStocks);
 
