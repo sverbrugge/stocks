@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\QueryException;
 
 use App\Dividend;
@@ -13,13 +12,13 @@ class DividendController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth', '2fa']);
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index()
     {
@@ -31,7 +30,7 @@ class DividendController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create()
     {
@@ -44,7 +43,7 @@ class DividendController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -66,7 +65,7 @@ class DividendController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Dividend  $dividend
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(Request $request, Dividend $dividend)
     {
@@ -80,7 +79,7 @@ class DividendController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Dividend  $dividend
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(Dividend $dividend)
     {
@@ -94,7 +93,7 @@ class DividendController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Dividend  $dividend
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(Request $request, Dividend $dividend)
     {
@@ -113,8 +112,9 @@ class DividendController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Dividend  $dividend
-     * @return \Illuminate\Http\Response
+     * @param \App\Dividend $dividend
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Dividend $dividend)
     {

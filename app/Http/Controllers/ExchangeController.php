@@ -12,13 +12,13 @@ class ExchangeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth', '2fa']);
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index()
     {
@@ -28,7 +28,7 @@ class ExchangeController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function create()
     {
@@ -39,7 +39,7 @@ class ExchangeController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function store(Request $request)
     {
@@ -64,7 +64,7 @@ class ExchangeController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Exchange  $exchange
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(Request $request, Exchange $exchange)
     {
@@ -78,7 +78,7 @@ class ExchangeController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Exchange  $exchange
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(Exchange $exchange)
     {
@@ -92,7 +92,7 @@ class ExchangeController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Exchange  $exchange
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
     public function update(Request $request, Exchange $exchange)
     {
@@ -115,8 +115,9 @@ class ExchangeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Exchange  $exchange
-     * @return \Illuminate\Http\Response
+     * @param \App\Exchange $exchange
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Exchange $exchange)
     {

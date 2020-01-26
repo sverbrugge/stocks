@@ -16,9 +16,18 @@ Route::get('/', function () {
 });
 
 // Authentication Routes...
-Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-Route::post('login', 'Auth\LoginController@login');
-Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Auth::routes([
+    'register' => false,
+    'reset' => false,
+    'verify' => false,
+]);
+
+Route::group(['prefix' => 'google2fa', 'as' => 'google2fa.', 'namespace' => 'Google2FA'], function () {
+    Route::get('/enable', 'AuthController@enable')->name('enable');
+    Route::post('/check', 'AuthController@check')->name('check');
+    Route::post('/authenticate', 'AuthController@authenticate')->name('authenticate');
+    Route::get('/disable', 'AuthController@disable')->name('disable');
+});
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('graph/{stock}', 'GraphController@index')->name('graph');

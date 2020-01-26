@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Stock;
 
 class GraphController extends Controller
@@ -14,7 +13,7 @@ class GraphController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth', '2fa']);
     }
 
     public function index(Stock $stock) {
@@ -22,7 +21,7 @@ class GraphController extends Controller
     }
 
     public function stock(Stock $stock) {
-        return $stock->quotes->map(function ($item, $key) {
+        return $stock->quotes->map(function ($item) {
             return [
                 $item->quoted_at->valueOf(),
                 (float)$item->price,

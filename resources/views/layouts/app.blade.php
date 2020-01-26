@@ -42,6 +42,16 @@
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    @unless(Auth::user()->{config('google2fa.otp_secret_column')})
+                                        <a class="dropdown-item" href="{{ route('google2fa.enable') }}">
+                                            @lang('Enable 2FA')
+                                        </a>
+                                    @else
+                                        <a class="dropdown-item" href="{{ route('google2fa.disable') }}">
+                                            @lang('Disable 2FA')
+                                        </a>
+                                    @endunless
+
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
