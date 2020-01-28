@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Exchange;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,8 +25,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function () use ($schedule) {
+            Exchange::select(['timezone', 'trading_from', 'trading_to'])->distinct()->each(function (Exchange $exchange) use ($schedule) {
+                $schedule->command('stocks:update --all')->timezone($exchange->timezone)->between($exchange->trading_from, $exchange->trading_to);
+            });
+        })->weekdays()->hourly();
     }
 
     /**
