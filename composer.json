@@ -9,6 +9,7 @@
         "bacon/bacon-qr-code": "^2.0",
         "fideloper/proxy": "~4.0",
         "kokspflanze/alpha-vantage-api": "^0.7.0",
+        "laminas/laminas-text": "^2.7",
         "laravel/framework": "5.8.*",
         "laravel/passport": "^7.0",
         "laravel/tinker": "~1.0",

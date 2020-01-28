@@ -6,8 +6,11 @@ use AlphaVantage\Api\TimeSeries;
 use AlphaVantage\Client;
 use AlphaVantage\Options;
 use App\Exceptions\StockNotTradingException;
+use App\Exchange;
 use App\Quote;
 use App\Stock;
+use Carbon\CarbonInterval;
+use DateInterval;
 use DateTimeZone;
 use Exception;
 use Generator;
@@ -37,6 +40,30 @@ class StocksService
     public function getTicker(string $ticker)
     {
         return Stock::ticker($ticker)->active()->firstOrFail();
+    }
+
+    /**
+     * @param Collection $exchanges
+     * @param Carbon $day
+     * @param DateInterval|null $interval
+     * @return Collection
+     */
+    public function getExchangeReport(Collection $exchanges, Carbon $day, DateInterval $interval = null) {
+        $compareTo = $day->clone()->subtract($interval ?? CarbonInterval::day(1));
+
+        return $exchanges->map(function (Exchange $exchange) use ($day, $compareTo) {
+            return $exchange->stocks()->active()->get()->map(function (Stock $stock) use ($day, $compareTo) {
+                $firstQuote = $stock->quotes()->whereBetween('quoted_at', [$compareTo, $day])->limit(1)->orderBy('quoted_at', 'asc')->firstOrFail();
+                $lastQuote = $stock->quotes()->whereBetween('quoted_at', [$compareTo, $day])->limit(1)->orderBy('quoted_at', 'desc')->firstOrFail();
+
+                return collect([
+                    'ticker' => $stock->ticker,
+                    'last_quote' => $lastQuote->price,
+                    'difference' => $lastQuote->price - $firstQuote->price,
+                    'percentage' => (($lastQuote->price - $firstQuote->price) / $lastQuote->price) * 100,
+                ]);
+            });
+        })->flatten(1);
     }
 
     /**
