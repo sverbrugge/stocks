@@ -69,11 +69,11 @@ class StocksService
     /**
      * @param Collection $stocks
      * @param bool $delay
+     * @param bool $force
      * @return Generator
-     * @throws Exception
      * @throws Throwable
      */
-    public function update(Collection $stocks, bool $delay = true)
+    public function update(Collection $stocks, bool $delay = true, bool $force = false)
     {
         foreach ($stocks as $stock) {
             $timestamp = new Carbon('now', new DateTimeZone($stock->exchange->timezone));
@@ -88,7 +88,7 @@ class StocksService
             ];
 
             try {
-                if ($tradingFrom->isPast() && $tradingTo->isFuture()) {
+                if ($force || ($tradingFrom->isPast() && $tradingTo->isFuture())) {
                     $data = $this->getQuote($stock, $delay);
 
                     if (!empty($data)) {

@@ -15,7 +15,7 @@ class StocksUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'stocks:update {--all} {symbol?}';
+    protected $signature = 'stocks:update {--all} {--force} {symbol?}';
 
     /**
      * The console command description.
@@ -61,7 +61,7 @@ class StocksUpdate extends Command
         $progressBar->setFormat('very_verbose');
         $progressBar->start();
 
-        $updatedStocks = $stocksService->update($stocks);
+        $updatedStocks = $stocksService->update($stocks, true, $this->option('force'));
         $processedStocks = [];
 
         foreach ($updatedStocks as $data) {
