@@ -13,7 +13,7 @@ class GraphController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['auth', '2fa']);
+        //
     }
 
     public function index(Stock $stock) {
