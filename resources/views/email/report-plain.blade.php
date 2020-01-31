@@ -1,0 +1,3 @@
+# Stocks Report
+
+{!! $text !!}

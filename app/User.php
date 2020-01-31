@@ -32,6 +32,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
+ * @property string|null $google2fa_secret
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereGoogle2faSecret($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable

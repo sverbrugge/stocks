@@ -15,15 +15,21 @@ class StocksReport extends Mailable
      * @var Collection
      */
     private $report;
+    /**
+     * @var string
+     */
+    private $text;
 
     /**
      * Create a new message instance.
      *
      * @param Collection $report
+     * @param string $text
      */
-    public function __construct(Collection $report)
+    public function __construct(Collection $report, string $text = '')
     {
         $this->report = $report;
+        $this->text = $text ?? trans('This message is HTML only. There is no plaintext available.');
     }
 
     /**
@@ -33,6 +39,12 @@ class StocksReport extends Mailable
      */
     public function build()
     {
-        return $this->markdown('email.report')->with('report', $this->report);
+        return $this
+            ->view('email.report')
+            ->text('email.report-plain')
+            ->with([
+                'report' => $this->report,
+                'text' => $this->text,
+            ]);
     }
 }

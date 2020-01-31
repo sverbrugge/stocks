@@ -9,8 +9,6 @@ use App\Exceptions\StockNotTradingException;
 use App\Exchange;
 use App\Quote;
 use App\Stock;
-use Carbon\CarbonInterval;
-use DateInterval;
 use DateTimeZone;
 use Exception;
 use Generator;
@@ -44,24 +42,31 @@ class StocksService
 
     /**
      * @param Collection $exchanges
-     * @param Carbon $day
-     * @param DateInterval|null $interval
+     * @param Carbon $from
+     * @param Carbon $to
      * @return Collection
      */
-    public function getExchangeReport(Collection $exchanges, Carbon $day, DateInterval $interval = null) {
-        $compareTo = $day->clone()->subtract($interval ?? CarbonInterval::day(1));
+    public function getExchangeReport(Collection $exchanges, Carbon $from, Carbon $to) {
+        return $exchanges->map(function (Exchange $exchange) use ($from, $to) {
+            return $exchange->stocks()->active()->get()->map(function (Stock $stock) use ($exchange, $from, $to) {
+                $from->setTimezone($exchange->timezone)->setTimeFromTimeString($exchange->trading_from);
+                $to->setTimezone($exchange->timezone)->setTimeFromTimeString($exchange->trading_to);
 
-        return $exchanges->map(function (Exchange $exchange) use ($day, $compareTo) {
-            return $exchange->stocks()->active()->get()->map(function (Stock $stock) use ($day, $compareTo) {
-                $firstQuote = $stock->quotes()->whereBetween('quoted_at', [$compareTo, $day])->limit(1)->orderBy('quoted_at', 'asc')->firstOrFail();
-                $lastQuote = $stock->quotes()->whereBetween('quoted_at', [$compareTo, $day])->limit(1)->orderBy('quoted_at', 'desc')->firstOrFail();
+                $from->timezone = config('app.timezone');
+                $to->timezone = config('app.timezone');
 
-                return collect([
-                    'ticker' => $stock->ticker,
-                    'last_quote' => $lastQuote->price,
-                    'difference' => $lastQuote->price - $firstQuote->price,
-                    'percentage' => (($lastQuote->price - $firstQuote->price) / $lastQuote->price) * 100,
-                ]);
+                $lastQuote = $stock->quotes()->whereBetween('quoted_at', [$from, $to])->latest()->first();
+                $firstQuote = $stock->quotes()->whereBetween('quoted_at', [$from, $to])->oldest()->first();
+
+                return [
+                    'stock' => $stock,
+                    'first_quote_date' => $firstQuote ? $firstQuote->quoted_at : null,
+                    'first_quote' => $firstQuote ? $firstQuote->price : null,
+                    'last_quote_date' => $lastQuote ? $lastQuote->quoted_at : null,
+                    'last_quote' => $lastQuote ? $lastQuote->price : null,
+                    'difference' => $lastQuote && $firstQuote ? $lastQuote->price - $firstQuote->price : null,
+                    'percentage' => $lastQuote && $firstQuote ? (($lastQuote->price - $firstQuote->price) / $lastQuote->price) * 100 : null,
+                ];
             });
         })->flatten(1);
     }

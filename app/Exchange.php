@@ -37,6 +37,9 @@ class Exchange extends Model
         'trading_to',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Stock
+     */
     public function stocks()
     {
         return $this->hasMany(Stock::class);

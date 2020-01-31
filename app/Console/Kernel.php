@@ -2,9 +2,14 @@
 
 namespace App\Console;
 
+use App\Console\Commands\StocksReport;
 use App\Exchange;
+use DateTimeZone;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,11 +30,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () use ($schedule) {
-            Exchange::select(['timezone', 'trading_from', 'trading_to'])->distinct()->each(function (Exchange $exchange) use ($schedule) {
-                $schedule->command('stocks:update --all')->timezone($exchange->timezone)->between($exchange->trading_from, $exchange->trading_to);
-            });
-        })->weekdays()->hourly();
+        $this->scheduleStocksUpdate($schedule);
+
+        $this->scheduleStocksReport($schedule);
     }
 
     /**
@@ -42,5 +45,52 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
+    }
+
+    /**
+     * @param Schedule $schedule
+     */
+    private function scheduleStocksUpdate(Schedule $schedule): void
+    {
+        $betweenTimes = Cache::remember('scheduleFromTo', 86400, function () {
+            $times = Exchange::select(['timezone', 'trading_from', 'trading_to'])->distinct()->get()->map(function (Exchange $exchange) {
+                return [
+                    'from' => new Carbon($exchange->trading_from, new DateTimeZone($exchange->timezone)),
+                    'to' => new Carbon($exchange->trading_to, new DateTimeZone($exchange->timezone)),
+                ];
+            });
+
+            return [
+                'from' => $times->min('from'),
+                'to' => $times->max('to'),
+            ];
+        });
+
+        $schedule->command('stocks:update --all')->weekdays()->hourly()->between($betweenTimes['from'], $betweenTimes['to']);
+    }
+
+    private function scheduleStocksReport(Schedule $schedule)
+    {
+        $times = Cache::remember('scheduleReports', 10, function () {
+            return Exchange::all()->mapToGroups(function (Exchange $exchange) {
+                $endOfDay = new Carbon($exchange->trading_to, new DateTimeZone($exchange->timezone));
+                return [
+                    $endOfDay->getTimestamp() => $exchange->id,
+                ];
+            });
+        });
+
+        $times->each(function ($exchangeIds, $timestamp) use ($schedule) {
+            /** @var Collection $exchangeIds */
+            $timestamp = Carbon::createFromTimestamp($timestamp)->addMinutes(15);
+            $options = $exchangeIds->values()->all();
+            $options[] = '--email';
+
+            $schedule
+                ->command(StocksReport::class, $options)
+                ->weekdays()
+                ->timezone($timestamp->timezone)
+                ->at($timestamp->toTimeString('minute'));
+        });
     }
 }
