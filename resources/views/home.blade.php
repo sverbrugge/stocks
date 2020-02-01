@@ -3,6 +3,29 @@
 @section('content')
 <div class="container">
     <div class="row">
+        @foreach($totals as $currencyCode => $gainLoss)
+            <div class="col-md-6 text-center">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th colspan="3">{{ $currencyCode }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-right alert-success">{{ sprintf('%0.4f', $gainLoss['gain']) }}</td>
+                            <td class="text-right alert-danger">{{ sprintf('%0.4f', $gainLoss['loss']) }}</td>
+                            <td class="text-right alert-{{ $gainLoss['gain'] + $gainLoss['loss'] >= 0 ? 'success' : 'danger' }}">{{ sprintf('%0.4f', $gainLoss['gain'] + $gainLoss['loss']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        @endforeach
+    </div>
+</div>
+<p>&nbsp;</p>
+<div class="container">
+    <div class="row">
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
