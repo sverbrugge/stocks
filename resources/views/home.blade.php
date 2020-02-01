@@ -59,55 +59,63 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($shares as $share)
-                        <tr>
-                            <td>
-                                <a href="{{ route('graph', [ 'stock' => $share->stock->id ]) }}">{{ $share->stock->name }}</a>
-                                @if($share->allSharesSold)
-                                    <span class="badge badge-info">@lang('All shares sold')</span>
-                                @endif
-                            </td>
-                            <td>
-                                {{ $share->stock->currency->code }}
-                            </td>
-                            <td>
-                                {{ $share->transacted_at->toDateString() }}
-                            </td>
-                            <td>
-                                {{ $share->transacted_at->diffForHumans() }}
-                            </td>
-                            <td class="text-right">
-                                {{ $share->amount }}
-                            </td>
-                            <td class="text-right">
-                                {{ $share->price }}
-                            </td>
-                            <td class="text-right">
-                                {{ $share->totalPrice }}
-                            </td>
-                            <?php $currentQuote = $share->stock->currentQuote; ?>
-                            @if($currentQuote)
-                                <td class="text-right table-{{ $share->colorClass }}" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
-                                    {{ $currentQuote->price }}
-                                </td>
-                            @else
-                                <td class="text-right table-{{ $share->colorClass }}">
+                    @forelse($shares as $exchangeName => $exchangeShares)
+                        <thead class="section">
+                            <tr>
+                                <th>{{ $exchangeName }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($exchangeShares as $share)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('graph', [ 'stock' => $share->stock->id ]) }}">{{ $share->stock->name }}</a>
+                                        @if($share->allSharesSold)
+                                            <span class="badge badge-info">@lang('All shares sold')</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $share->stock->currency->code }}
+                                    </td>
+                                    <td>
+                                        {{ $share->transacted_at->toDateString() }}
+                                    </td>
+                                    <td>
+                                        {{ $share->transacted_at->diffForHumans() }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $share->amount }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $share->price }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ $share->totalPrice }}
+                                    </td>
+                                    @if($currentQuote = $share->stock->currentQuote)
+                                        <td class="text-right table-{{ $share->colorClass }}" title="{{ $currentQuote->quoted_at }} ({{ $currentQuote->quoted_at->diffForHumans() }})">
+                                            {{ $currentQuote->price }}
+                                        </td>
+                                    @else
+                                        <td class="text-right table-{{ $share->colorClass }}">
 
-                                </td>
-                            @endif
-                            <td class="text-right table-{{ $share->colorClass }}">
-                                {{ $share->percentGain }}
-                            </td>
-                        </tr>
+                                        </td>
+                                    @endif
+                                    <td class="text-right table-{{ $share->colorClass }}">
+                                        {{ $share->percentGain }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
                     @empty
-                        <tr>
-                            <td colspan="9">
-                                @lang('No shares found')
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td colspan="9">
+                                    @lang('No shares found')
+                                </td>
+                            </tr>
+                        </tbody>
                     @endforelse
-                </tbody>
             </table>
         </div>
     </div>

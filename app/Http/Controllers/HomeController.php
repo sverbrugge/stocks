@@ -47,7 +47,7 @@ class HomeController extends Controller
         });
 
         return view('home')->with([
-            'shares' => $shares,
+            'shares' => $shares->groupBy('stock.exchange.name'),
             'totals' => $totals,
         ]);
     }
