@@ -13,6 +13,5 @@ yarn-error.log
 .env
 /public/js
 /public/css
-/.idea/
 _ide_helper.php
 .phpstorm.meta.php
