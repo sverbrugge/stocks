@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int|null $parent_id
  * @property \Illuminate\Support\Carbon|null $transacted_at
  * @property int $amount
- * @property float $price
- * @property float $exchange_rate
+ * @property string $price
+ * @property string $exchange_rate
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Share[] $children
+ * @property int $active
+ * @property-read \Illuminate\Database\Eloquent\Collection|Share[] $children
  * @property-read int|null $children_count
+ * @property-read mixed $all_shares_sold
  * @property-read mixed $color_class
  * @property-read mixed $gain
  * @property-read mixed $gain_color_class
@@ -26,26 +28,26 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read mixed $sold_gain
  * @property-read mixed $sold_gain_percent
  * @property-read mixed $total_price
- * @property-read \App\Share|null $parent
+ * @property-read Share|null $parent
  * @property-read \App\Stock $stock
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share sold()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereExchangeRate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereParentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereStockId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereTransactedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereUpdatedAt($value)
+ * @method static Builder|Share active(bool $active = true)
+ * @method static Builder|Share newModelQuery()
+ * @method static Builder|Share newQuery()
+ * @method static Builder|Share query()
+ * @method static Builder|Share sold()
+ * @method static Builder|Share whereActive($value)
+ * @method static Builder|Share whereAmount($value)
+ * @method static Builder|Share whereCreatedAt($value)
+ * @method static Builder|Share whereExchangeRate($value)
+ * @method static Builder|Share whereId($value)
+ * @method static Builder|Share whereParentId($value)
+ * @method static Builder|Share wherePrice($value)
+ * @method static Builder|Share whereStockId($value)
+ * @method static Builder|Share whereTransactedAt($value)
+ * @method static Builder|Share whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property int $active
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share active($active = true)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Share whereActive($value)
- * @property-read bool $all_shares_sold
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
  */
 class Share extends Model
 {

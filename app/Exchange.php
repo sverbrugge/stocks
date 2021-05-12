@@ -16,17 +16,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Stock[] $stocks
  * @property-read int|null $stocks_count
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereTimezone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereTradingFrom($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereTradingTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Exchange whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereTradingFrom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereTradingTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exchange whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
  */
 class Exchange extends Model
 {

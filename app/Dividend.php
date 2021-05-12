@@ -11,20 +11,22 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $id
  * @property int $stock_id
  * @property \Illuminate\Support\Carbon $transacted_at
- * @property float $price
+ * @property string $price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Stock $stock
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend whereStockId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend whereTransactedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Dividend whereUpdatedAt($value)
+ * @method static Builder|Dividend newModelQuery()
+ * @method static Builder|Dividend newQuery()
+ * @method static Builder|Dividend query()
+ * @method static Builder|Dividend whereCreatedAt($value)
+ * @method static Builder|Dividend whereId($value)
+ * @method static Builder|Dividend wherePrice($value)
+ * @method static Builder|Dividend whereStockId($value)
+ * @method static Builder|Dividend whereTransactedAt($value)
+ * @method static Builder|Dividend whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
  */
 class Dividend extends Model
 {

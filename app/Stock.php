@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $exchange_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $active
  * @property-read \App\Currency $currency
  * @property-read \App\Exchange $exchange
  * @property-read mixed $active_shares
@@ -23,21 +24,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $quotes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Share[] $shares
  * @property-read int|null $shares_count
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereCurrencyId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereExchangeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereTicker($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereUpdatedAt($value)
+ * @method static Builder|Stock active(bool $active = true)
+ * @method static Builder|Stock newModelQuery()
+ * @method static Builder|Stock newQuery()
+ * @method static Builder|Stock query()
+ * @method static Builder|Stock ticker(string $ticker)
+ * @method static Builder|Stock whereActive($value)
+ * @method static Builder|Stock whereCreatedAt($value)
+ * @method static Builder|Stock whereCurrencyId($value)
+ * @method static Builder|Stock whereExchangeId($value)
+ * @method static Builder|Stock whereId($value)
+ * @method static Builder|Stock whereName($value)
+ * @method static Builder|Stock whereTicker($value)
+ * @method static Builder|Stock whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property int $active
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock active($active = true)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Stock ticker($ticker)
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
  */
 class Stock extends Model
 {

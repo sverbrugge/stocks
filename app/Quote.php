@@ -10,21 +10,23 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * @property int $id
  * @property int $stock_id
- * @property float $price
+ * @property string $price
  * @property \Illuminate\Support\Carbon $quoted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Stock $stock
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote whereQuotedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote whereStockId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Quote whereUpdatedAt($value)
+ * @method static Builder|Quote newModelQuery()
+ * @method static Builder|Quote newQuery()
+ * @method static Builder|Quote query()
+ * @method static Builder|Quote whereCreatedAt($value)
+ * @method static Builder|Quote whereId($value)
+ * @method static Builder|Quote wherePrice($value)
+ * @method static Builder|Quote whereQuotedAt($value)
+ * @method static Builder|Quote whereStockId($value)
+ * @method static Builder|Quote whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
  */
 class Quote extends Model
 {
