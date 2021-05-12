@@ -41,7 +41,7 @@
                                             {{ $stock->ticker }}
                                     </td>
                                     <td>
-                                        <a href="{{ route('stocks.show', [ 'stocks' => $stock ])}}">
+                                        <a href="{{ route('stocks.show', [ 'stock' => $stock ])}}">
                                             {{ $stock->name }}
                                         </a>
                                     </td>

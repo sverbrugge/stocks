@@ -34,7 +34,7 @@
                             @forelse($dividends as $dividend)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('dividends.show', [ 'dividends' => $dividend ])}}">
+                                        <a href="{{ route('dividends.show', [ 'dividend' => $dividend ])}}">
                                             {{ $dividend->stock->name }}
                                         </a>
                                     </td>

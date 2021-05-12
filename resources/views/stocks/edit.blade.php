@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <h1>@lang('Edit stock ":name (:ticker)"', [ 'name' => $stock->name, 'ticker' => $stock->ticker ])</h1>
 
-            <form action="{{ route('stocks.update', [ 'stocks' => $stock ]) }}" method="post">
+            <form action="{{ route('stocks.update', [ 'stock' => $stock ]) }}" method="post">
                 @csrf
                 @method('PUT')
 
@@ -46,7 +46,7 @@
                 @endcomponent
 
                 @component('form.submit')
-                    @slot('return_route', route('stocks.show', [ 'stocks' => $stock ]))
+                    @slot('return_route', route('stocks.show', [ 'stock' => $stock ]))
                 @endcomponent
             </form>
 

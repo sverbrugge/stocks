@@ -11,7 +11,7 @@
                 @endif
             </h1>
 
-            <form action="{{ route('dividends.update', [ 'dividends' => $dividend ]) }}" method="post">
+            <form action="{{ route('dividends.update', [ 'dividend' => $dividend ]) }}" method="post">
                 @csrf
                 @method('PUT')
 
@@ -41,7 +41,7 @@
                 @endcomponent
 
                 @component('form.submit')
-                    @slot('return_route', route('dividends.show', [ 'dividends' => $dividend ]))
+                    @slot('return_route', route('dividends.show', [ 'dividend' => $dividend ]))
                 @endcomponent
             </form>
 

@@ -73,7 +73,7 @@
     <div class="row">
         @if($confirmDeletion)
             <div class="col-md-12 text-center">
-                    <form action="{{ route('shares.destroy', [ 'shares' => $share ]) }}" method="post">
+                    <form action="{{ route('shares.destroy', [ 'share' => $share ]) }}" method="post">
                         @csrf
                         @method('DELETE')
 
@@ -85,14 +85,14 @@
                             @lang('Delete')
                         </button>
 
-                        <a role="button" class="btn btn-secondary float-right" href="{{ route('shares.show', [ 'shares' => $share ]) }}">
+                        <a role="button" class="btn btn-secondary float-right" href="{{ route('shares.show', [ 'share' => $share ]) }}">
                             @lang('Cancel')
                         </a>
                     </form>
             </div>
         @else
             <div class="col-md-4">
-                <a role="button" class="btn btn-primary" href="{{ route('shares.edit', [ 'shares' => $share ])}}">
+                <a role="button" class="btn btn-primary" href="{{ route('shares.edit', [ 'share' => $share ])}}">
                     @lang('Edit')
                 </a>
                 <a role="button" class="btn btn-secondary" href="{{ route('shares.index', ['inactive' => (($share->parent && !$share->parent->active) || !$share->active) ?: null]) }}">
@@ -107,7 +107,7 @@
                 @endunless
             </div>
             <div class="col-md-4 text-right">
-                <a role="button" class="btn btn-danger" href="{{ route('shares.show', [ 'shares' => $share, 'delete' => 'confirm' ])}}">
+                <a role="button" class="btn btn-danger" href="{{ route('shares.show', [ 'share' => $share, 'delete' => 'confirm' ])}}">
                     @lang('Delete')
                 </a>
             </div>

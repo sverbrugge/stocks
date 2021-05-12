@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Exchange;
 use App\Mail\StocksReport as StocksReportMail;
 use App\Stocks\StocksService;
-use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -13,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Laminas\Text\Table\Column;
 use Laminas\Text\Table\Row;
 use Laminas\Text\Table\Table;
+use Throwable;
 
 class StocksReport extends Command
 {
@@ -31,22 +31,12 @@ class StocksReport extends Command
     protected $description = 'Generate a report based on latest stock quotes';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
-     * @return mixed
-     * @throws Exception
+     * @return int
+     * @throws Throwable
      */
-    public function handle()
+    public function handle(): int
     {
         $exchangeIds = $this->argument('exchange_id');
         $exchanges = Exchange::with('stocks')->whereIn('id', $exchangeIds)->get();
@@ -62,11 +52,11 @@ class StocksReport extends Command
         if ($this->option('email')) {
             Mail::to(env('MAIL_REPORT_TO', 'www-data'))->send(new StocksReportMail($report, $plainTextTable));
             $this->info('E-mail sent');
-            return;
+            return 1;
         }
 
         echo $plainTextTable;
-        return;
+        return 0;
     }
 
     /**

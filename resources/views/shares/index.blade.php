@@ -41,7 +41,7 @@
                             @forelse($shares as $share)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('shares.show', [ 'shares' => $share ])}}">
+                                        <a href="{{ route('shares.show', [ 'share' => $share ])}}">
                                             {{ $share->stock->name }}
                                         </a>
                                     </td>
@@ -62,7 +62,7 @@
                                 @foreach($share->children as $child)
                                     <tr>
                                         <td class="text-right">
-                                            <a href="{{ route('shares.show', [ 'shares' => $child ])}}">
+                                            <a href="{{ route('shares.show', [ 'share' => $child ])}}">
                                                 <span class="badge badge-info">@lang('Sell')</span>
                                             </a>
                                         </td>

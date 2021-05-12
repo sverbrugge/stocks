@@ -65,7 +65,7 @@
                 @endif
 
                 @component('form.submit')
-                    @slot('return_route', route('shares.show', [ 'shares' => $share ]))
+                    @slot('return_route', route('shares.show', [ 'share' => $share ]))
                 @endcomponent
             </form>
 

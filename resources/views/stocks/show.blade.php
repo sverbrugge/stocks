@@ -55,7 +55,7 @@
     <div class="row">
         @if($confirmDeletion)
             <div class="col-md-12 text-center">
-                    <form action="{{ route('stocks.destroy', [ 'stocks' => $stock ]) }}" method="post">
+                    <form action="{{ route('stocks.destroy', [ 'stock' => $stock ]) }}" method="post">
                         @csrf
                         @method('DELETE')
 
@@ -67,14 +67,14 @@
                             @lang('Delete')
                         </button>
 
-                        <a role="button" class="btn btn-secondary float-right" href="{{ route('stocks.show', [ 'stocks' => $stock ]) }}">
+                        <a role="button" class="btn btn-secondary float-right" href="{{ route('stocks.show', [ 'stock' => $stock ]) }}">
                             @lang('Cancel')
                         </a>
                     </form>
             </div>
         @else
             <div class="col-md-6">
-                <a role="button" class="btn btn-primary" href="{{ route('stocks.edit', [ 'stocks' => $stock ])}}">
+                <a role="button" class="btn btn-primary" href="{{ route('stocks.edit', [ 'stock' => $stock ])}}">
                     @lang('Edit')
                 </a>
                 <a role="button" class="btn btn-secondary" href="{{ route('stocks.index', ['inactive' => !$stock->active ?: null]) }}">
@@ -82,7 +82,7 @@
                 </a>
             </div>
             <div class="col-md-6 text-right">
-                <a role="button" class="btn btn-danger" href="{{ route('stocks.show', [ 'stocks' => $stock, 'delete' => 'confirm' ])}}">
+                <a role="button" class="btn btn-danger" href="{{ route('stocks.show', [ 'stock' => $stock, 'delete' => 'confirm' ])}}">
                     @lang('Delete')
                 </a>
             </div>

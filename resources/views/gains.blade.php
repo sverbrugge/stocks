@@ -37,7 +37,7 @@
                             @forelse ($shares as $share)
                                 <tr class="">
                                     <td>
-                                        <a href="{{ route('stocks.show', [ 'stocks' => $share->stock ])}}">
+                                        <a href="{{ route('stocks.show', [ 'stock' => $share->stock ])}}">
                                             {{ $share->stock->name }}
                                         </a>
                                     </td>

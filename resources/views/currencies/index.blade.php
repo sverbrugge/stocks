@@ -34,7 +34,7 @@
                             @forelse ($currencies as $currency)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('currencies.show', [ 'currencies' => $currency ])}}">
+                                        <a href="{{ route('currencies.show', [ 'currency' => $currency ])}}">
                                             {{ $currency->code }}
                                         </a>
                                     </td>

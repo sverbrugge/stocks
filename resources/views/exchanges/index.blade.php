@@ -37,7 +37,7 @@
                             @forelse ($exchanges as $exchange)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('exchanges.show', [ 'exchanges' => $exchange ])}}">
+                                        <a href="{{ route('exchanges.show', [ 'exchange' => $exchange ])}}">
                                             {{ $exchange->name }}
                                         </a>
                                     </td>

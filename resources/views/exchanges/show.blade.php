@@ -47,7 +47,7 @@
     <div class="row">
         @if($confirmDeletion)
             <div class="col-md-12 text-center">
-                    <form action="{{ route('exchanges.destroy', [ 'exchanges' => $exchange ]) }}" method="post">
+                    <form action="{{ route('exchanges.destroy', [ 'exchange' => $exchange ]) }}" method="post">
                         @csrf
                         @method('DELETE')
 
@@ -59,14 +59,14 @@
                             @lang('Delete')
                         </button>
 
-                        <a role="button" class="btn btn-secondary float-right" href="{{ route('exchanges.show', [ 'exchanges' => $exchange ]) }}">
+                        <a role="button" class="btn btn-secondary float-right" href="{{ route('exchanges.show', [ 'exchange' => $exchange ]) }}">
                             @lang('Cancel')
                         </a>
                     </form>
             </div>
         @else
             <div class="col-md-6">
-                <a role="button" class="btn btn-primary" href="{{ route('exchanges.edit', [ 'exchanges' => $exchange ])}}">
+                <a role="button" class="btn btn-primary" href="{{ route('exchanges.edit', [ 'exchange' => $exchange ])}}">
                     @lang('Edit')
                 </a>
                 <a role="button" class="btn btn-secondary" href="{{ route('exchanges.index') }}">
@@ -74,7 +74,7 @@
                 </a>
             </div>
             <div class="col-md-6 text-right">
-                <a role="button" class="btn btn-danger" href="{{ route('exchanges.show', [ 'exchanges' => $exchange, 'delete' => 'confirm' ])}}">
+                <a role="button" class="btn btn-danger" href="{{ route('exchanges.show', [ 'exchange' => $exchange, 'delete' => 'confirm' ])}}">
                     @lang('Delete')
                 </a>
             </div>

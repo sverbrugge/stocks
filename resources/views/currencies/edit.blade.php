@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <h1>@lang('Edit currency ":code"', [ 'code' => $currency->code ])</h1>
 
-            <form action="{{ route('currencies.update', [ 'currencies' => $currency ]) }}" method="post">
+            <form action="{{ route('currencies.update', [ 'currency' => $currency ]) }}" method="post">
                 @csrf
                 @method('PUT')
 
@@ -33,7 +33,7 @@
                 @endcomponent
 
                 @component('form.submit')
-                    @slot('return_route', route('currencies.show', [ 'currencies' => $currency ]))
+                    @slot('return_route', route('currencies.show', [ 'currency' => $currency ]))
                 @endcomponent
             </form>
 

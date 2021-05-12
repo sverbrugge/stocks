@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <h1>@lang('Edit exchange ":name"', [ 'name' => $exchange->name ])</h1>
 
-            <form action="{{ route('exchanges.update', [ 'exchanges' => $exchange ]) }}" method="post">
+            <form action="{{ route('exchanges.update', [ 'exchange' => $exchange ]) }}" method="post">
                 @csrf
                 @method('PUT')
 
@@ -41,7 +41,7 @@
                 @endcomponent
 
                 @component('form.submit')
-                    @slot('return_route', route('exchanges.show', [ 'exchanges' => $exchange ]))
+                    @slot('return_route', route('exchanges.show', [ 'exchange' => $exchange ]))
                 @endcomponent
             </form>
 

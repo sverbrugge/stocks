@@ -39,7 +39,7 @@
     <div class="row">
         @if($confirmDeletion)
             <div class="col-md-12 text-center">
-                    <form action="{{ route('currencies.destroy', [ 'currencies' => $currency ]) }}" method="post">
+                    <form action="{{ route('currencies.destroy', [ 'currency' => $currency ]) }}" method="post">
                         @csrf
                         @method('DELETE')
 
@@ -51,14 +51,14 @@
                             @lang('Delete')
                         </button>
 
-                        <a role="button" class="btn btn-secondary float-right" href="{{ route('currencies.show', [ 'currencies' => $currency ]) }}">
+                        <a role="button" class="btn btn-secondary float-right" href="{{ route('currencies.show', [ 'currency' => $currency ]) }}">
                             @lang('Cancel')
                         </a>
                     </form>
             </div>
         @else
             <div class="col-md-6">
-                <a role="button" class="btn btn-primary" href="{{ route('currencies.edit', [ 'currencies' => $currency ])}}">
+                <a role="button" class="btn btn-primary" href="{{ route('currencies.edit', [ 'currency' => $currency ])}}">
                     @lang('Edit')
                 </a>
                 <a role="button" class="btn btn-secondary" href="{{ route('currencies.index') }}">
@@ -66,7 +66,7 @@
                 </a>
             </div>
             <div class="col-md-6 text-right">
-                <a role="button" class="btn btn-danger" href="{{ route('currencies.show', [ 'currencies' => $currency, 'delete' => 'confirm' ])}}">
+                <a role="button" class="btn btn-danger" href="{{ route('currencies.show', [ 'currency' => $currency, 'delete' => 'confirm' ])}}">
                     @lang('Delete')
                 </a>
             </div>

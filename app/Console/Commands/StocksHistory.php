@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class StocksHistory extends Command
 {
@@ -25,29 +26,19 @@ class StocksHistory extends Command
     protected $description = 'Update historical stocks data';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
-     * @return mixed
-     * @throws \Throwable
+     * @return int
+     * @throws Throwable
      */
-    public function handle()
+    public function handle(): int
     {
         $stocksService = new StocksService();
         $full = $this->option('full');
 
         if (!$this->option('all') && !$this->argument('symbol')) {
             $this->warn('You need to provide a ticker symbol.');
-            return null;
+            return 1;
         }
 
         if ($full) {
@@ -58,7 +49,7 @@ class StocksHistory extends Command
             $stocks = $this->option('all') ? $stocksService->getAllTickers() : new Collection([$stocksService->getTicker($this->argument('symbol'))]);
         } catch (ModelNotFoundException $e) {
             $this->warn('Ticker symbol not found or not active: "' . $this->argument('symbol') . '"');
-            return null;
+            return 2;
         }
         $progressBar = $this->output->createProgressBar($stocks->count());
         $progressBar->setFormat('very_verbose');
@@ -87,6 +78,6 @@ class StocksHistory extends Command
         ];
         $this->table($headers, $processedStocks);
 
-        return $processedStocks;
+        return 0;
     }
 }
