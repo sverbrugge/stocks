@@ -3,26 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Share;
+use Illuminate\Contracts\Support\Renderable;
 
 class GainController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware(['auth', '2fa']);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function index()
+    public function index(): Renderable
     {
-        return view('gains')->with('shares', Share::sold()->paginate());
+        return view('gains')
+            ->with(
+                [
+                    'shares' => Share::sold()->paginate(),
+                ]
+            );
     }
 }

@@ -17,8 +17,8 @@
 	</a>
 </li>
 
-<li class="nav-item {{ Route::currentRouteNamed('gains') ? 'active' : '' }}">
-	<a class="nav-link" href="{{ route('gains') }}">
+<li class="nav-item {{ Route::currentRouteNamed('gains.*') ? 'active' : '' }}">
+	<a class="nav-link" href="{{ route('gains.index') }}">
 		@lang('Gains')
 	</a>
 </li>

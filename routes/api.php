@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,4 +11,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/graph/stock/{stock}', 'GraphController@stock');
+use App\Http\Controllers\GraphController;
+
+Route::get('/graph/stock/{stock}', [GraphController::class, 'stock']);

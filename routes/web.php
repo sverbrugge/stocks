@@ -11,30 +11,48 @@
 |
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\DividendController;
+use App\Http\Controllers\ExchangeController;
+use App\Http\Controllers\GainController;
+use App\Http\Controllers\Google2FA\AuthController;
+use App\Http\Controllers\GraphController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ShareController;
+use App\Http\Controllers\StockController;
 
-// Authentication Routes...
 Auth::routes([
     'register' => false,
     'reset' => false,
     'verify' => false,
 ]);
 
-Route::group(['prefix' => 'google2fa', 'as' => 'google2fa.', 'namespace' => 'Google2FA'], function () {
-    Route::get('/enable', 'AuthController@enable')->name('enable');
-    Route::post('/check', 'AuthController@check')->name('check');
-    Route::post('/authenticate', 'AuthController@authenticate')->name('authenticate');
-    Route::get('/disable', 'AuthController@disable')->name('disable');
-});
+Route::prefix('google2fa')
+    ->as('google2fa.')
+    ->group(function () {
+        Route::get('enable', [AuthController::class, 'enable'])
+            ->name('enable');
 
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('graph/{stock}', 'GraphController@index')->name('graph');
+        Route::post('check', [AuthController::class, 'check'])
+            ->name('check');
 
-Route::resource('stocks', 'StockController');
-Route::resource('shares', 'ShareController');
-Route::resource('dividends', 'DividendController');
-Route::get('gains', 'GainController@index')->name('gains');
-Route::resource('exchanges', 'ExchangeController');
-Route::resource('currencies', 'CurrencyController');
+        Route::post('authenticate', [AuthController::class, 'authenticate'])
+            ->name('authenticate');
+
+        Route::get('disable', [AuthController::class, 'disable'])
+            ->name('disable');
+    });
+
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
+
+Route::get('graph/{stock}', [GraphController::class, 'index'])
+    ->name('graph');
+
+Route::resource('stocks', StockController::class);
+Route::resource('shares', ShareController::class);
+Route::resource('dividends', DividendController::class);
+Route::resource('gains', GainController::class)
+    ->only('index');
+Route::resource('exchanges', ExchangeController::class);
+Route::resource('currencies', CurrencyController::class);

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
@@ -15,148 +17,162 @@ class ShareController extends Controller
         $this->middleware(['auth', '2fa']);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function index(Request $request)
+    public function index(Request $request): Renderable
     {
         $inactive = $request->get('inactive');
-        return view('shares.index')->with([
-            'shares' => Share::active(!$inactive)->with(['stock', 'children'])->whereNull('parent_id')->paginate(),
-            'inactive' => $inactive,
-        ]);
+
+        return view('shares.index')
+            ->with(
+                [
+                    'shares' => Share::active(!$inactive)->with(['stock', 'children'])->whereNull(
+                        'parent_id'
+                    )->paginate(),
+                    'inactive' => $inactive,
+                ]
+            );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param \Illuminate\Http\Request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function create(Request $request)
+    public function create(Request $request): Renderable
     {
-        $request->validate([
-            'sell' => [ 'nullable', 'exists:shares,id' ],
-        ]);
+        $request->validate(
+            [
+                'sell' => ['nullable', 'exists:shares,id'],
+            ]
+        );
 
-        if($parent_id = $request->input('sell')) {
-            return view('shares.sell')->with([
-                'parent' => Share::findOrFail($parent_id),
-            ]);
+        if ($parent_id = $request->input('sell')) {
+            return view('shares.sell')
+                ->with(
+                    [
+                        'parent' => Share::findOrFail($parent_id),
+                    ]
+                );
         }
 
-        return view('shares.create')->with([
-            'stocks'    => Stock::all(),
-        ]);
+        return view('shares.create')
+            ->with(
+                [
+                    'stocks' => Stock::all(),
+                ]
+            );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'parent_id'     => [ 'nullable', 'exists:shares,id' ],
-            'stock_id'      => [ 'required', 'exists:stocks,id' ],
-            'transacted_at' => [ 'required', 'date_format:Y-m-d' ],
-            'amount'        => [ 'required', 'integer' ],
-            'price'         => [ 'required', 'numeric' ],
-            'exchange_rate' => [ 'required', 'numeric' ],
-        ]);
+        $request->validate(
+            [
+                'parent_id' => ['nullable', 'exists:shares,id'],
+                'stock_id' => ['required', 'exists:stocks,id'],
+                'transacted_at' => ['required', 'date_format:Y-m-d'],
+                'amount' => ['required', 'integer'],
+                'price' => ['required', 'numeric'],
+                'exchange_rate' => ['required', 'numeric'],
+            ]
+        );
 
-        $share = Share::create($request->only('parent_id', 'stock_id', 'transacted_at', 'amount', 'price', 'exchange_rate'));
+        $share = Share::create(
+            $request->only('parent_id', 'stock_id', 'transacted_at', 'amount', 'price', 'exchange_rate')
+        );
 
-        $message = $request->input('parent_id') ? 'The sell ":name (:date)" has been added.' : 'The share ":name (:date)" has been added.';
+        $message = $request->input('parent_id')
+            ? 'The sell ":name (:date)" has been added.'
+            : 'The share ":name (:date)" has been added.';
 
-        return redirect()->route('shares.index')->with([
-            'success' => __($message, [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y')]),
-        ]);
+        return redirect()
+            ->route('shares.index')
+            ->with(
+                [
+                    'success' => __(
+                        $message,
+                        [
+                            'name' => $share->stock->name,
+                            'date' => $share->transacted_at->formatLocalized('%d %B %Y'),
+                        ]
+                    ),
+                ]
+            );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Share  $share
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function show(Request $request, Share $share)
+    public function show(Request $request, Share $share): Renderable
     {
-        return view('shares.show')->with([
-            'share'             => $share,
-            'confirmDeletion'   => $request->input('delete') == 'confirm',
-        ]);
+        return view('shares.show')
+            ->with(
+                [
+                    'share' => $share,
+                    'confirmDeletion' => $request->input('delete') == 'confirm',
+                ]
+            );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Share  $share
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function edit(Share $share)
+    public function edit(Share $share): Renderable
     {
-        return view('shares.edit')->with([
-            'share'         => $share,
-        ]);
+        return view('shares.edit')
+            ->with(
+                [
+                    'share' => $share,
+                ]
+            );
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Share  $share
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
-     */
-    public function update(Request $request, Share $share)
+    public function update(Request $request, Share $share): RedirectResponse
     {
-        $request->validate([
-            'transacted_at' => [ 'required', 'date_format:Y-m-d' ],
-            'amount'        => [ 'required', 'integer' ],
-            'price'         => [ 'required', 'numeric' ],
-            'exchange_rate' => [ 'required', 'numeric' ],
-        ]);
+        $request->validate(
+            [
+                'transacted_at' => ['required', 'date_format:Y-m-d'],
+                'amount' => ['required', 'integer'],
+                'price' => ['required', 'numeric'],
+                'exchange_rate' => ['required', 'numeric'],
+            ]
+        );
 
         $fields = ['transacted_at', 'amount', 'price', 'active'];
+
         if (!$share->parent_id) {
-            $request->validate([
-                'active'        => [ 'required', 'boolean' ],
-            ]);
+            $request->validate(
+                [
+                    'active' => ['required', 'boolean'],
+                ]
+            );
+
             $fields[] = 'active';
         }
 
         $share->update($request->only($fields));
 
-        return redirect()->route('shares.show', [ 'shares' => $share ])->with([
-            'success' => __('Your changes have been saved.'),
-        ]);
+        return redirect()
+            ->route('shares.show', ['shares' => $share])
+            ->with(
+                [
+                    'success' => __('Your changes have been saved.'),
+                ]
+            );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Share $share
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
-     * @throws \Exception
-     */
-    public function destroy(Share $share)
+    public function destroy(Share $share): RedirectResponse
     {
         try {
             $share->delete();
-        }
-        catch (QueryException $e)
-        {
-            return redirect()->route('shares.show', [ 'shares' => $share])->with('warning', __('This item could not be deleted.'));
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('shares.show', ['shares' => $share])
+                ->with(
+                    'warning',
+                    __('This item could not be deleted.')
+                );
         }
 
-        return redirect()->route('shares.index')->with([
-            'info' => __('You have succesfully deleted ":name (:date)".', [ 'name' => $share->stock->name, 'date' => $share->transacted_at->formatLocalized('%d %B %Y')]),
-        ]);
+        return redirect()
+            ->route('shares.index')
+            ->with(
+                [
+                    'info' => __(
+                        'You have succesfully deleted ":name (:date)".',
+                        [
+                            'name' => $share->stock->name,
+                            'date' => $share->transacted_at->formatLocalized('%d %B %Y'),
+                        ]
+                    ),
+                ]
+            );
     }
 }
