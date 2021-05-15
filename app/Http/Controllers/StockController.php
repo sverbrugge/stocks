@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\QueryException;
 
-use App\Stock;
-use App\Currency;
-use App\Exchange;
+use App\Models\Stock;
+use App\Models\Currency;
+use App\Models\Exchange;
 
 class StockController extends Controller
 {

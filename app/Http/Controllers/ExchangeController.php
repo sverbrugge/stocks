@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\QueryException;
 
-use App\Exchange;
+use App\Models\Exchange;
 
 class ExchangeController extends Controller
 {

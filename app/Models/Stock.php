@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Stock
+ * App\Models\Stock
  *
  * @property int $id
  * @property string|null $ticker
@@ -16,13 +16,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $active
- * @property-read \App\Currency $currency
- * @property-read \App\Exchange $exchange
+ * @property-read \App\Models\Currency $currency
+ * @property-read \App\Models\Exchange $exchange
  * @property-read mixed $active_shares
  * @property-read mixed $current_quote
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Quote[] $quotes
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Quote[] $quotes
  * @property-read int|null $quotes_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Share[] $shares
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Share[] $shares
  * @property-read int|null $shares_count
  * @method static Builder|Stock active(bool $active = true)
  * @method static Builder|Stock newModelQuery()

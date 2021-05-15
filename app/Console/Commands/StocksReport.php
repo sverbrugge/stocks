@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Exchange;
+use App\Models\Exchange;
 use App\Mail\StocksReport as StocksReportMail;
 use App\Stocks\StocksService;
 use Illuminate\Console\Command;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Share;
+use App\Models\Share;
 use Illuminate\Contracts\Support\Renderable;
 
 class GainController extends Controller

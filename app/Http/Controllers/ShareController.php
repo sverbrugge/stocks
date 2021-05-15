@@ -7,8 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
-use App\Share;
-use App\Stock;
+use App\Models\Share;
+use App\Models\Stock;
 
 class ShareController extends Controller
 {

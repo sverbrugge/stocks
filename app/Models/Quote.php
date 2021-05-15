@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * App\Quote
+ * App\Models\Quote
  *
  * @property int $id
  * @property int $stock_id
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon $quoted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Stock $stock
+ * @property-read \App\Models\Stock $stock
  * @method static Builder|Quote newModelQuery()
  * @method static Builder|Quote newQuery()
  * @method static Builder|Quote query()

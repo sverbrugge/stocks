@@ -2,7 +2,7 @@
 
 namespace Database\Seeders\Migration;
 
-use App\Quote;
+use App\Models\Quote;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders\Migration;
 
-use App\Dividend;
+use App\Models\Dividend;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

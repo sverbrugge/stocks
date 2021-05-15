@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * App\Share
+ * App\Models\Share
  *
  * @property int $id
  * @property int $stock_id
@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read mixed $sold_gain_percent
  * @property-read mixed $total_price
  * @property-read Share|null $parent
- * @property-read \App\Stock $stock
+ * @property-read \App\Models\Stock $stock
  * @method static Builder|Share active(bool $active = true)
  * @method static Builder|Share newModelQuery()
  * @method static Builder|Share newQuery()

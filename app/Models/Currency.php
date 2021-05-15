@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Currency
+ * App\Models\Currency
  *
  * @property int $id
  * @property string $code

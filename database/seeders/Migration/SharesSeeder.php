@@ -2,7 +2,7 @@
 
 namespace Database\Seeders\Migration;
 
-use App\Share;
+use App\Models\Share;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Exchange
+ * App\Models\Exchange
  *
  * @property int $id
  * @property string $name
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $trading_to
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Stock[] $stocks
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Stock[] $stocks
  * @property-read int|null $stocks_count
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newQuery()
@@ -40,7 +40,7 @@ class Exchange extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Stock
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Stock
      */
     public function stocks()
     {

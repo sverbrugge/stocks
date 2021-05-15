@@ -7,8 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
-use App\Dividend;
-use App\Stock;
+use App\Models\Dividend;
+use App\Models\Stock;
 
 class DividendController extends Controller
 {

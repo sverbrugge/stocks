@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\QueryException;
-
-use App\Currency;
 
 class CurrencyController extends Controller
 {

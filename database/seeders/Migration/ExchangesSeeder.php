@@ -2,7 +2,7 @@
 
 namespace Database\Seeders\Migration;
 
-use App\Exchange;
+use App\Models\Exchange;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

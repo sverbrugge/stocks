@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * App\Dividend
+ * App\Models\Dividend
  *
  * @property int $id
  * @property int $stock_id
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Stock $stock
+ * @property-read \App\Models\Stock $stock
  * @method static Builder|Dividend newModelQuery()
  * @method static Builder|Dividend newQuery()
  * @method static Builder|Dividend query()
