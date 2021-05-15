@@ -72,6 +72,14 @@ class Stock extends Model
     }
 
     /**
+     * @return HasMany|Dividend
+     */
+    public function dividends(): HasMany
+    {
+        return $this->hasMany(Dividend::class);
+    }
+
+    /**
      * @return BelongsTo|Exchange
      */
     public function exchange(): BelongsTo
