@@ -12,7 +12,7 @@
         "kokspflanze/alpha-vantage-api": "^0.7.0",
         "laminas/laminas-text": "^2.7",
         "laravel/framework": "^8.0",
-        "laravel/passport": "^10.0",
+        "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
         "pragmarx/google2fa-laravel": "^1.3"
