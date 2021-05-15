@@ -17,8 +17,8 @@ class ShareFactory extends Factory
             'parent_id' => null,
             'transacted_at' => $this->faker->dateTime,
             'amount' => $this->faker->numberBetween(1, 9999),
-            'price' => $this->faker->randomFloat(4),
-            'exchange_rate' => $this->faker->randomFloat(4),
+            'price' => $this->faker->randomFloat(4, 0, 9999),
+            'exchange_rate' => $this->faker->randomFloat(4, 0, 9999),
             'active' => $this->faker->boolean(90),
         ];
     }

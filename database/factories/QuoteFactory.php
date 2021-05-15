@@ -14,7 +14,7 @@ class QuoteFactory extends Factory
     {
         return [
             'stock_id' => Stock::factory(),
-            'price' => $this->faker->randomFloat(4),
+            'price' => $this->faker->randomFloat(4, 0, 9999),
             'quoted_at' => $this->faker->dateTime,
         ];
     }

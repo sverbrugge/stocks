@@ -15,8 +15,8 @@ class StockFactory extends Factory
     public function definition(): array
     {
         return [
-            'ticker' => Str::upper($this->faker->unique()->asciify('***')),
-            'name' => $this->faker->unique()->asciify('******'),
+            'ticker' => Str::upper($this->faker->unique()->lexify('???')),
+            'name' => $this->faker->unique()->lexify('??????'),
             'currency_id' => Currency::factory(),
             'exchange_id' => Exchange::factory(),
             'active' => $this->faker->boolean(80),

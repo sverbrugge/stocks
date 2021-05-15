@@ -15,7 +15,7 @@ class DividendFactory extends Factory
         return [
             'stock_id' => Stock::factory(),
             'transacted_at' => $this->faker->dateTime,
-            'price' => $this->faker->randomFloat(4),
+            'price' => $this->faker->randomFloat(4, 0, 9999),
         ];
     }
 }
