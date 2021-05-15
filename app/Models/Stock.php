@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 /**
  * App\Models\Stock
@@ -19,13 +22,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $active
  * @property-read \App\Models\Currency $currency
  * @property-read \App\Models\Exchange $exchange
- * @property-read mixed $active_shares
- * @property-read mixed $current_quote
+ * @property-read \Illuminate\Support\Collection|\App\Models\Share[] $active_shares
+ * @property-read \App\Models\Quote|null $current_quote
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Quote[] $quotes
  * @property-read int|null $quotes_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Share[] $shares
  * @property-read int|null $shares_count
  * @method static Builder|Stock active(bool $active = true)
+ * @method static \Database\Factories\StockFactory factory(...$parameters)
  * @method static Builder|Stock newModelQuery()
  * @method static Builder|Stock newQuery()
  * @method static Builder|Stock query()
@@ -51,7 +55,7 @@ class Stock extends Model
         'name',
         'currency_id',
         'exchange_id',
-        'active'
+        'active',
     ];
 
     protected $with = [
@@ -59,39 +63,64 @@ class Stock extends Model
         'currency',
     ];
 
-    public function exchange()
-    {
-        return $this->belongsTo(Exchange::class);
-    }
-
-    public function currency()
+    /**
+     * @return BelongsTo|Currency
+     */
+    public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
     }
 
-    public function shares() {
+    /**
+     * @return BelongsTo|Exchange
+     */
+    public function exchange(): BelongsTo
+    {
+        return $this->belongsTo(Exchange::class);
+    }
+
+    /**
+     * @return HasMany|Share
+     */
+    public function shares(): HasMany
+    {
         return $this->hasMany(Share::class);
     }
 
-    public function getActiveSharesAttribute() {
-        return $this->shares()->whereNull('parent_id')->get();
-    }
-
-    public function quotes() {
+    /**
+     * @return HasMany|Quote
+     */
+    public function quotes(): HasMany
+    {
         return $this->hasMany(Quote::class);
     }
 
-    public function getCurrentQuoteAttribute() {
-        return $this->quotes()->orderBy('quoted_at', 'DESC')->first();
-    }
 
-    public function scopeActive(Builder $query, bool $active = true)
+    public function scopeActive(Builder $query, bool $active = true): Builder
     {
         return $query->where('active', $active);
     }
 
-    public function scopeTicker(Builder $query, string $ticker)
+    public function scopeTicker(Builder $query, string $ticker): Builder
     {
         return $query->where('ticker', $ticker);
+    }
+
+    /**
+     * @return Collection|Share[]
+     */
+    public function getActiveSharesAttribute(): Collection
+    {
+        return $this->shares()
+            ->whereNull('parent_id')
+            ->get();
+    }
+
+    public function getCurrentQuoteAttribute(): ?Quote
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->quotes()
+            ->orderBy('quoted_at', 'DESC')
+            ->first();
     }
 }

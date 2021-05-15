@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Exchange
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Stock[] $stocks
  * @property-read int|null $stocks_count
+ * @method static \Database\Factories\ExchangeFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Exchange query()
@@ -43,9 +45,9 @@ class Exchange extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Stock
+     * @return HasMany|Stock
      */
-    public function stocks()
+    public function stocks(): HasMany
     {
         return $this->hasMany(Stock::class);
     }

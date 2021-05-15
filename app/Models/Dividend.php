@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Dividend
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Stock $stock
+ * @method static \Database\Factories\DividendFactory factory(...$parameters)
  * @method static Builder|Dividend newModelQuery()
  * @method static Builder|Dividend newQuery()
  * @method static Builder|Dividend query()
@@ -43,16 +45,23 @@ class Dividend extends Model
         'price',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::addGlobalScope('sortByTransactionDate', function (Builder $builder) {
-            $builder->orderBy('transacted_at', 'DESC');
-        });
+        static::addGlobalScope(
+            'sortByTransactionDate',
+            function (Builder $builder) {
+                $builder->orderBy('transacted_at', 'DESC');
+            }
+        );
     }
 
-    public function stock() {
+    /**
+     * @return BelongsTo|Stock
+     */
+    public function stock(): BelongsTo
+    {
         return $this->belongsTo(Stock::class);
     }
 }

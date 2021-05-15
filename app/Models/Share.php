@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Share
@@ -21,17 +23,18 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int $active
  * @property-read \Illuminate\Database\Eloquent\Collection|Share[] $children
  * @property-read int|null $children_count
- * @property-read mixed $all_shares_sold
- * @property-read mixed $color_class
- * @property-read mixed $gain
- * @property-read mixed $gain_color_class
- * @property-read mixed $percent_gain
- * @property-read mixed $sold_gain
- * @property-read mixed $sold_gain_percent
- * @property-read mixed $total_price
+ * @property-read string $all_shares_sold
+ * @property-read string $color_class
+ * @property-read string $gain
+ * @property-read string $gain_color_class
+ * @property-read string $percent_gain
+ * @property-read string $sold_gain
+ * @property-read string $sold_gain_percent
+ * @property-read string $total_price
  * @property-read Share|null $parent
  * @property-read \App\Models\Stock $stock
  * @method static Builder|Share active(bool $active = true)
+ * @method static \Database\Factories\ShareFactory factory(...$parameters)
  * @method static Builder|Share newModelQuery()
  * @method static Builder|Share newQuery()
  * @method static Builder|Share query()
@@ -72,68 +75,67 @@ class Share extends Model
         'stock',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::addGlobalScope('sortByTransactionDate', function (Builder $builder) {
-            $builder->orderBy('transacted_at', 'DESC');
-        });
+        static::addGlobalScope(
+            'sortByTransactionDate',
+            function (Builder $builder) {
+                $builder->orderBy('transacted_at', 'DESC');
+            }
+        );
     }
 
-    public function stock()
+    /**
+     * @return HasMany|Share
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Share::class, 'parent_id');
+    }
+
+    /**
+     * @return BelongsTo|Share
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Share::class, 'parent_id');
+    }
+
+    /**
+     * @return BelongsTo|Stock
+     */
+    public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);
     }
 
-    public function parent()
+    public function scopeActive(Builder $query, bool $active = true): Builder
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $query->where('active', $active);
     }
 
-    public function children()
+    public function scopeSold(Builder $query): Builder
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $query->whereNotNull('parent_id');
     }
 
-    public function getTotalPriceAttribute()
+    public function getAllSharesSoldAttribute(): string
     {
-        return number_format($this->amount * $this->price, 4);
+        $parent = $this->parent
+            ?: $this;
+
+        return $parent->children->sum('amount') === $parent->amount;
     }
 
-    public function getGainAttribute()
+    public function getColorClassAttribute(): string
     {
-        return ($this->stock->currentQuote->price <=> $this->price ? '+' : '') . sprintf('%.2f', $this->stock->currentQuote->price - $this->price);
-    }
-
-    public function getSoldGainAttribute()
-    {
-        return $this->parent ? sprintf('%.4f', $this->totalPrice - $this->parent->totalPrice) : '';
-    }
-
-    public function getSoldGainPercentAttribute()
-    {
-        return $this->parent ? sprintf('%.2f', ($this->totalPrice - $this->parent->totalPrice) / $this->parent->totalPrice * 100) : '';
-    }
-
-    public function getPercentGainAttribute()
-    {
-        $currentQuote = $this->stock->currentQuote;
-
-        if (!$currentQuote) {
+        if (!$this->stock->current_quote) {
             return '';
         }
 
-        return sprintf('%.2f%%', ($currentQuote->price / $this->price * 100) - 100);
-    }
-
-    public function getColorClassAttribute()
-    {
-        if (!$this->stock->currentQuote) {
-            return '';
-        }
-
-        switch ($this->price <=> $this->stock->currentQuote->price) {
+        switch ($this->price <=> $this->stock->current_quote->price) {
             case -1:
                 return 'success';
 
@@ -144,7 +146,15 @@ class Share extends Model
         return '';
     }
 
-    public function getGainColorClassAttribute()
+    public function getGainAttribute(): string
+    {
+        return ($this->stock->current_quote->price <=> $this->price ? '+' : '') . sprintf(
+                '%.2f',
+                $this->stock->current_quote->price - $this->price
+            );
+    }
+
+    public function getGainColorClassAttribute(): string
     {
         switch ($this->soldGain <=> 0) {
             case 1:
@@ -157,19 +167,33 @@ class Share extends Model
         return '';
     }
 
-    public function getAllSharesSoldAttribute()
+    public function getPercentGainAttribute(): string
     {
-        $parent = $this->parent ?: $this;
-        return $parent->children->sum('amount') === $parent->amount;
+        $currentQuote = $this->stock->current_quote;
+
+        if (!$currentQuote) {
+            return '';
+        }
+
+        return sprintf('%.2f%%', ($currentQuote->price / $this->price * 100) - 100);
     }
 
-    public function scopeSold(Builder $query)
+    public function getSoldGainAttribute(): string
     {
-        return $query->whereNotNull('parent_id');
+        return $this->parent
+            ? sprintf('%.4f', $this->total_price - $this->parent->total_price)
+            : '';
     }
 
-    public function scopeActive(Builder $query, bool $active = true)
+    public function getSoldGainPercentAttribute(): string
     {
-        return $query->where('active', $active);
+        return $this->parent
+            ? sprintf('%.2f', ($this->total_price - $this->parent->total_price) / $this->parent->total_price * 100)
+            : '';
+    }
+
+    public function getTotalPriceAttribute(): string
+    {
+        return number_format($this->amount * $this->price, 4);
     }
 }

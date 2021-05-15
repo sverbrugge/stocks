@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Quote
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Stock $stock
+ * @method static \Database\Factories\QuoteFactory factory(...$parameters)
  * @method static Builder|Quote newModelQuery()
  * @method static Builder|Quote newQuery()
  * @method static Builder|Quote query()
@@ -43,16 +45,23 @@ class Quote extends Model
         'quoted_at',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::addGlobalScope('orderByDateQuoted', function (Builder $builder) {
-            $builder->orderBy('quoted_at', 'ASC');
-        });
+        static::addGlobalScope(
+            'orderByDateQuoted',
+            function (Builder $builder) {
+                $builder->orderBy('quoted_at', 'ASC');
+            }
+        );
     }
 
-    public function stock() {
+    /**
+     * @return BelongsTo|Stock
+     */
+    public function stock(): BelongsTo
+    {
         return $this->belongsTo(Stock::class);
     }
 }
